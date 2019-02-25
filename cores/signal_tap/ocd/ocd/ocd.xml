@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy
+ date="2019.02.14.23:25:00"
+ outputDirectory="C:/arc/repo/sdram/cores/signal_tap/ocd/">
+ <perimeter>
+  <parameter
+     name="AUTO_GENERATION_ID"
+     type="Integer"
+     defaultValue="0"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_UNIQUE_ID"
+     type="String"
+     defaultValue=""
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_FAMILY"
+     type="String"
+     defaultValue="Cyclone 10 LP"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE"
+     type="String"
+     defaultValue="10CL016YU256C8G"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_SPEEDGRADE"
+     type="String"
+     defaultValue="8"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_ACQ_CLK_CLOCK_RATE"
+     type="Long"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_ACQ_CLK_CLOCK_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_ACQ_CLK_RESET_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <interface name="acq_clk" kind="clock" start="0">
+   <property name="clockRate" value="0" />
+   <property name="externallyDriven" value="false" />
+   <property name="ptfSchematicName" value="" />
+   <port name="acq_clk" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="tap" kind="conduit" start="0">
+   <property name="associatedClock" value="acq_clk" />
+   <property name="associatedReset" value="" />
+   <port name="acq_data_in" direction="input" role="acq_data_in" width="256" />
+   <port
+       name="acq_trigger_in"
+       direction="input"
+       role="acq_trigger_in"
+       width="4" />
+  </interface>
+ </perimeter>
+ <entity
+   path=""
+   parameterizationKey="ocd:1.0:AUTO_ACQ_CLK_CLOCK_DOMAIN=-1,AUTO_ACQ_CLK_CLOCK_RATE=-1,AUTO_ACQ_CLK_RESET_DOMAIN=-1,AUTO_DEVICE=10CL016YU256C8G,AUTO_DEVICE_FAMILY=Cyclone 10 LP,AUTO_DEVICE_SPEEDGRADE=8,AUTO_GENERATION_ID=1550215499,AUTO_UNIQUE_ID=(altera_signaltap_ii_logic_analyzer:18.1:device_family=Cyclone 10 LP,gui_num_segments=2,gui_ram_type=AUTO,gui_sample_per_segment=,gui_sq=Continuous,gui_trigger_out_enabled=false,gui_use_segmented=false,sld_counter_pipeline=0,sld_data_bits=256,sld_enable_advanced_trigger=0,sld_incremental_routing=0,sld_node_crc_bits=32,sld_node_crc_hiword=2210,sld_node_crc_loword=30398,sld_node_info=806383104,sld_pipeline_factor=0,sld_ram_block_type=AUTO,sld_ram_pipeline=0,sld_sample_depth=1024,sld_segment_size=0,sld_storage_qualifier_gap_record=0,sld_storage_qualifier_mode=OFF,sld_trigger_bits=4,sld_trigger_in_enabled=0,sld_trigger_level=1,sld_trigger_level_pipeline=1,sld_trigger_pipeline=0)"
+   instancePathKey="ocd"
+   kind="ocd"
+   version="1.0"
+   name="ocd">
+  <parameter name="AUTO_ACQ_CLK_CLOCK_RATE" value="-1" />
+  <parameter name="AUTO_ACQ_CLK_CLOCK_DOMAIN" value="-1" />
+  <parameter name="AUTO_GENERATION_ID" value="1550215499" />
+  <parameter name="AUTO_DEVICE" value="10CL016YU256C8G" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone 10 LP" />
+  <parameter name="AUTO_ACQ_CLK_RESET_DOMAIN" value="-1" />
+  <parameter name="AUTO_UNIQUE_ID" value="" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="8" />
+  <generatedFiles>
+   <file
+       path="C:/arc/repo/sdram/cores/signal_tap/ocd/synthesis/ocd.v"
+       type="VERILOG" />
+  </generatedFiles>
+  <childGeneratedFiles/>
+  <sourceFiles>
+   <file path="C:/arc/repo/sdram/cores/signal_tap/ocd.qsys" />
+  </sourceFiles>
+  <childSourceFiles>
+   <file
+       path="C:/intelfpga_lite/18.1/ip/altera/sld/jtag/altera_signaltap_ii_logic_analyzer/altera_signaltap_ii_logic_analyzer_hw.tcl" />
+  </childSourceFiles>
+  <messages>
+   <message level="Debug" culprit="ocd">queue size: 0 starting:ocd "ocd"</message>
+   <message level="Progress" culprit="min"></message>
+   <message level="Progress" culprit="max"></message>
+   <message level="Progress" culprit="current"></message>
+   <message level="Debug">Transform: CustomInstructionTransform</message>
+   <message level="Debug">No custom instruction connections, skipping transform </message>
+   <message level="Debug" culprit="merlin_custom_instruction_transform"><![CDATA[After transform: <b>1</b> modules, <b>0</b> connections]]></message>
+   <message level="Debug">Transform: MMTransform</message>
+   <message level="Debug">Transform: InterruptMapperTransform</message>
+   <message level="Debug">Transform: InterruptSyncTransform</message>
+   <message level="Debug">Transform: InterruptFanoutTransform</message>
+   <message level="Debug">Transform: AvalonStreamingTransform</message>
+   <message level="Debug">Transform: ResetAdaptation</message>
+   <message level="Debug" culprit="ocd"><![CDATA["<b>ocd</b>" reuses <b>altera_signaltap_ii_logic_analyzer</b> "<b>submodules/sld_signaltap</b>"]]></message>
+   <message level="Debug" culprit="ocd">queue size: 0 starting:altera_signaltap_ii_logic_analyzer "submodules/sld_signaltap"</message>
+   <message level="Info" culprit="signaltap_ii_logic_analyzer_0"><![CDATA["<b>ocd</b>" instantiated <b>altera_signaltap_ii_logic_analyzer</b> "<b>signaltap_ii_logic_analyzer_0</b>"]]></message>
+  </messages>
+ </entity>
+ <entity
+   path="submodules/"
+   parameterizationKey="altera_signaltap_ii_logic_analyzer:18.1:device_family=Cyclone 10 LP,gui_num_segments=2,gui_ram_type=AUTO,gui_sample_per_segment=,gui_sq=Continuous,gui_trigger_out_enabled=false,gui_use_segmented=false,sld_counter_pipeline=0,sld_data_bits=256,sld_enable_advanced_trigger=0,sld_incremental_routing=0,sld_node_crc_bits=32,sld_node_crc_hiword=8522,sld_node_crc_loword=55810,sld_node_info=806383104,sld_pipeline_factor=0,sld_ram_block_type=AUTO,sld_ram_pipeline=0,sld_sample_depth=1024,sld_segment_size=0,sld_storage_qualifier_gap_record=0,sld_storage_qualifier_mode=OFF,sld_trigger_bits=4,sld_trigger_in_enabled=0,sld_trigger_level=1,sld_trigger_level_pipeline=1,sld_trigger_pipeline=0"
+   instancePathKey="ocd:.:signaltap_ii_logic_analyzer_0"
+   kind="altera_signaltap_ii_logic_analyzer"
+   version="18.1"
+   name="sld_signaltap">
+  <parameter name="gui_sq" value="Continuous" />
+  <parameter name="gui_ram_type" value="AUTO" />
+  <parameter name="device_family" value="Cyclone 10 LP" />
+  <parameter name="gui_trigger_out_enabled" value="false" />
+  <parameter name="sld_node_crc_bits" value="32" />
+  <parameter name="sld_data_bits" value="256" />
+  <parameter name="sld_node_info" value="806383104" />
+  <parameter name="sld_storage_qualifier_mode" value="OFF" />
+  <parameter name="sld_trigger_in_enabled" value="0" />
+  <parameter name="sld_segment_size" value="0" />
+  <parameter name="gui_use_segmented" value="false" />
+  <parameter name="sld_storage_qualifier_gap_record" value="0" />
+  <parameter name="sld_sample_depth" value="1024" />
+  <parameter name="sld_trigger_pipeline" value="0" />
+  <parameter name="sld_trigger_level_pipeline" value="1" />
+  <parameter name="sld_counter_pipeline" value="0" />
+  <parameter name="sld_enable_advanced_trigger" value="0" />
+  <parameter name="sld_ram_pipeline" value="0" />
+  <parameter name="sld_ram_block_type" value="AUTO" />
+  <parameter name="sld_incremental_routing" value="0" />
+  <parameter name="gui_sample_per_segment" value="" />
+  <parameter name="sld_pipeline_factor" value="0" />
+  <parameter name="sld_trigger_bits" value="4" />
+  <parameter name="sld_trigger_level" value="1" />
+  <parameter name="gui_num_segments" value="2" />
+  <generatedFiles/>
+  <childGeneratedFiles/>
+  <sourceFiles>
+   <file
+       path="C:/intelfpga_lite/18.1/ip/altera/sld/jtag/altera_signaltap_ii_logic_analyzer/altera_signaltap_ii_logic_analyzer_hw.tcl" />
+  </sourceFiles>
+  <childSourceFiles/>
+  <instantiator instantiator="ocd" as="signaltap_ii_logic_analyzer_0" />
+  <messages>
+   <message level="Debug" culprit="ocd">queue size: 0 starting:altera_signaltap_ii_logic_analyzer "submodules/sld_signaltap"</message>
+   <message level="Info" culprit="signaltap_ii_logic_analyzer_0"><![CDATA["<b>ocd</b>" instantiated <b>altera_signaltap_ii_logic_analyzer</b> "<b>signaltap_ii_logic_analyzer_0</b>"]]></message>
+  </messages>
+ </entity>
+</deploy>

@@ -1,0 +1,80 @@
+Info: Starting: Create simulation model
+Info: qsys-generate C:\arc\repo\sdram\cores\sdram\sdram.qsys --simulation=VERILOG --allow-mixed-language-simulation --output-directory=C:\arc\repo\sdram\cores\sdram\sdram\simulation --family="Cyclone 10 LP" --part=10CL016YU256C8G
+Progress: Loading sdram/sdram.qsys
+Progress: Reading input file
+Progress: Adding ISSI_SDRAM [altera_avalon_new_sdram_controller 18.1]
+Progress: Parameterizing module ISSI_SDRAM
+Progress: Adding clk [clock_source 18.1]
+Progress: Parameterizing module clk
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: sdram.ISSI_SDRAM: SDRAM Controller will only be supported in Quartus Prime Standard Edition in the future release.
+Info: sdram: Generating sdram "sdram" for SIM_VERILOG
+Info: ISSI_SDRAM: Starting RTL generation for module 'sdram_ISSI_SDRAM'
+Info: ISSI_SDRAM:   Generation command is [exec C:/intelfpga_lite/18.1/quartus/bin64/perl/bin/perl.exe -I C:/intelfpga_lite/18.1/quartus/bin64/perl/lib -I C:/intelfpga_lite/18.1/quartus/sopc_builder/bin/europa -I C:/intelfpga_lite/18.1/quartus/sopc_builder/bin/perl_lib -I C:/intelfpga_lite/18.1/quartus/sopc_builder/bin -I C:/intelfpga_lite/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/intelfpga_lite/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_new_sdram_controller -- C:/intelfpga_lite/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_new_sdram_controller/generate_rtl.pl --name=sdram_ISSI_SDRAM --dir=C:/Users/lenovo/AppData/Local/Temp/alt7941_541173972961046749.dir/0002_ISSI_SDRAM_gen/ --quartus_dir=C:/intelfpga_lite/18.1/quartus --verilog --config=C:/Users/lenovo/AppData/Local/Temp/alt7941_541173972961046749.dir/0002_ISSI_SDRAM_gen//sdram_ISSI_SDRAM_component_configuration.pl  --do_build_sim=1    --sim_dir=C:/Users/lenovo/AppData/Local/Temp/alt7941_541173972961046749.dir/0002_ISSI_SDRAM_gen/  ]
+Info: ISSI_SDRAM: Done RTL generation for module 'sdram_ISSI_SDRAM'
+Info: ISSI_SDRAM: "sdram" instantiated altera_avalon_new_sdram_controller "ISSI_SDRAM"
+Info: rst_controller: "sdram" instantiated altera_reset_controller "rst_controller"
+Info: sdram: Done "sdram" with 3 modules, 6 files
+Info: qsys-generate succeeded.
+Info: Finished: Create simulation model
+Info: Starting: Create Modelsim Project.
+Info: sim-script-gen --spd=C:\arc\repo\sdram\cores\sdram\sdram\sdram.spd --output-directory=C:/arc/repo/sdram/cores/sdram/sdram/simulation/ --use-relative-paths=true
+Info: Doing: ip-make-simscript --spd=C:\arc\repo\sdram\cores\sdram\sdram\sdram.spd --output-directory=C:/arc/repo/sdram/cores/sdram/sdram/simulation/ --use-relative-paths=true
+Info: Generating the following file(s) for MODELSIM simulator in C:/arc/repo/sdram/cores/sdram/sdram/simulation/ directory:
+Info: 	mentor/msim_setup.tcl
+Info: Generating the following file(s) for VCS simulator in C:/arc/repo/sdram/cores/sdram/sdram/simulation/ directory:
+Info: 	synopsys/vcs/vcs_setup.sh
+Info: Generating the following file(s) for VCSMX simulator in C:/arc/repo/sdram/cores/sdram/sdram/simulation/ directory:
+Info: 	synopsys/vcsmx/synopsys_sim.setup
+Info: 	synopsys/vcsmx/vcsmx_setup.sh
+Info: Generating the following file(s) for NCSIM simulator in C:/arc/repo/sdram/cores/sdram/sdram/simulation/ directory:
+Info: 	cadence/cds.lib
+Info: 	cadence/hdl.var
+Info: 	cadence/ncsim_setup.sh
+Info: 	2 .cds.lib files in cadence/cds_libs/ directory
+Info: Generating the following file(s) for RIVIERA simulator in C:/arc/repo/sdram/cores/sdram/sdram/simulation/ directory:
+Info: 	aldec/rivierapro_setup.tcl
+Info: For information on how to simulate your IP, see the explanatory comments in the simulator-specific subdirectories under C:/arc/repo/sdram/cores/sdram/sdram/simulation/.
+Info: Regenerate these scripts whenever you make any change to any Quartus-generated IP in your project.
+Info: Finished: Create Modelsim Project.
+Info: Starting: Create block symbol file (.bsf)
+Info: qsys-generate C:\arc\repo\sdram\cores\sdram\sdram.qsys --block-symbol-file --output-directory=C:\arc\repo\sdram\cores\sdram\sdram --family="Cyclone 10 LP" --part=10CL016YU256C8G
+Progress: Loading sdram/sdram.qsys
+Progress: Reading input file
+Progress: Adding ISSI_SDRAM [altera_avalon_new_sdram_controller 18.1]
+Progress: Parameterizing module ISSI_SDRAM
+Progress: Adding clk [clock_source 18.1]
+Progress: Parameterizing module clk
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: sdram.ISSI_SDRAM: SDRAM Controller will only be supported in Quartus Prime Standard Edition in the future release.
+Info: qsys-generate succeeded.
+Info: Finished: Create block symbol file (.bsf)
+Info: 
+Info: Starting: Create HDL design files for synthesis
+Info: qsys-generate C:\arc\repo\sdram\cores\sdram\sdram.qsys --synthesis=VERILOG --output-directory=C:\arc\repo\sdram\cores\sdram\sdram\synthesis --family="Cyclone 10 LP" --part=10CL016YU256C8G
+Progress: Loading sdram/sdram.qsys
+Progress: Reading input file
+Progress: Adding ISSI_SDRAM [altera_avalon_new_sdram_controller 18.1]
+Progress: Parameterizing module ISSI_SDRAM
+Progress: Adding clk [clock_source 18.1]
+Progress: Parameterizing module clk
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: sdram.ISSI_SDRAM: SDRAM Controller will only be supported in Quartus Prime Standard Edition in the future release.
+Info: sdram: Generating sdram "sdram" for QUARTUS_SYNTH
+Info: ISSI_SDRAM: Starting RTL generation for module 'sdram_ISSI_SDRAM'
+Info: ISSI_SDRAM:   Generation command is [exec C:/intelfpga_lite/18.1/quartus/bin64/perl/bin/perl.exe -I C:/intelfpga_lite/18.1/quartus/bin64/perl/lib -I C:/intelfpga_lite/18.1/quartus/sopc_builder/bin/europa -I C:/intelfpga_lite/18.1/quartus/sopc_builder/bin/perl_lib -I C:/intelfpga_lite/18.1/quartus/sopc_builder/bin -I C:/intelfpga_lite/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/intelfpga_lite/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_new_sdram_controller -- C:/intelfpga_lite/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_new_sdram_controller/generate_rtl.pl --name=sdram_ISSI_SDRAM --dir=C:/Users/lenovo/AppData/Local/Temp/alt7941_541173972961046749.dir/0005_ISSI_SDRAM_gen/ --quartus_dir=C:/intelfpga_lite/18.1/quartus --verilog --config=C:/Users/lenovo/AppData/Local/Temp/alt7941_541173972961046749.dir/0005_ISSI_SDRAM_gen//sdram_ISSI_SDRAM_component_configuration.pl  --do_build_sim=0  ]
+Info: ISSI_SDRAM: Done RTL generation for module 'sdram_ISSI_SDRAM'
+Info: ISSI_SDRAM: "sdram" instantiated altera_avalon_new_sdram_controller "ISSI_SDRAM"
+Info: rst_controller: "sdram" instantiated altera_reset_controller "rst_controller"
+Info: sdram: Done "sdram" with 3 modules, 6 files
+Info: qsys-generate succeeded.
+Info: Finished: Create HDL design files for synthesis

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="simulation/submodules/sld_signaltap.v"
+   type="VERILOG"
+   library="signaltap_ii_logic_analyzer_0" />
+ <file path="simulation/ocd.v" type="VERILOG" />
+ <topLevel name="ocd" />
+ <deviceFamily name="cyclone10lp" />
+</simPackage>

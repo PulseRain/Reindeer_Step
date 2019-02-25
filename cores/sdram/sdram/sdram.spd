@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="simulation/submodules/altera_reset_controller.v"
+   type="VERILOG"
+   library="rst_controller" />
+ <file
+   path="simulation/submodules/altera_reset_synchronizer.v"
+   type="VERILOG"
+   library="rst_controller" />
+ <file
+   path="simulation/submodules/altera_reset_controller.sdc"
+   type="SDC"
+   library="rst_controller" />
+ <file
+   path="simulation/submodules/sdram_ISSI_SDRAM.v"
+   type="VERILOG"
+   library="ISSI_SDRAM" />
+ <file
+   path="simulation/submodules/sdram_ISSI_SDRAM_test_component.v"
+   type="VERILOG"
+   library="ISSI_SDRAM" />
+ <file path="simulation/sdram.v" type="VERILOG" />
+ <topLevel name="sdram" />
+ <deviceFamily name="cyclone10lp" />
+</simPackage>

@@ -1,0 +1,23 @@
+# system info sdram on 2019.02.14.01:25:46
+system_info:
+name,value
+DEVICE,10CL016YU256C8G
+DEVICE_FAMILY,Cyclone 10 LP
+GENERATION_ID,1550136341
+#
+#
+# Files generated for sdram on 2019.02.14.01:25:46
+files:
+filepath,kind,attributes,module,is_top
+simulation/sdram.v,VERILOG,,sdram,true
+simulation/submodules/sdram_ISSI_SDRAM.v,VERILOG,,sdram_ISSI_SDRAM,false
+simulation/submodules/sdram_ISSI_SDRAM_test_component.v,VERILOG,,sdram_ISSI_SDRAM,false
+simulation/submodules/altera_reset_controller.v,VERILOG,,altera_reset_controller,false
+simulation/submodules/altera_reset_synchronizer.v,VERILOG,,altera_reset_controller,false
+simulation/submodules/altera_reset_controller.sdc,SDC,,altera_reset_controller,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+sdram.ISSI_SDRAM,sdram_ISSI_SDRAM
+sdram.rst_controller,altera_reset_controller
