@@ -1,0 +1,6 @@
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../source/CRC16_CCITT.v"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../source/debug_coprocessor.v"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../source/debug_UART.sv"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../source/debug_reply.sv"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../source/Serial_RS232.sv"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../source/debug_coprocessor_wrapper.sv"]
