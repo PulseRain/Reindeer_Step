@@ -598,8 +598,8 @@ if __name__ == "__main__":
     #=========================================================================
     
     print ("===============================================================================")
-    print ("# Copyright (c) 2018, PulseRain Technology LLC ")
-    print ("# Reindeer Configuration Utility, Version 1.0")
+    print ("# Copyright (c) 2019, PulseRain Technology LLC ")
+    print ("# Reindeer Configuration Utility, Version 2.0")
     
     
     #=========================================================================
@@ -661,14 +661,14 @@ if __name__ == "__main__":
             print ("    -P, --port=          : the name of the COM port, such as COM7")
             print ("    -d, --baud=          : the baud rate, default to be 115200")
             print ("    -t, --toolchain=     : setup the toolchain. By default, ", toolchain, " is used")
-            print ("    -e, --elf=           : path and name to the elf image file")
+            print ("    -i, --image=         : path and name to the image file")
             print ("    -d, --dump_addr      : start address for memory dumping")
             print ("    -l, --dump_length    : length of the memory dump")
             print ("    -c, --console_enable : switch to observe the CPU UART after image is loaded.")
             print ("    --mem_test_len=      : run memory test for the specified number of words.")
             print (" ")
             print ("    Example: To run the zephyr hello_world application")
-            print ("     python reindeer_config.py --port=COM9 --reset --elf=C:\GitHub\Reindeer\bitstream_and_binary\zephyr\hello_world.elf --console_enable --run")
+            print ("     python reindeer_config.py --port=COM9 --reset --image=C:\GitHub\Reindeer\bitstream_and_binary\zephyr\hello_world.elf --console_enable --run")
             
             sys.exit(1)
             
