@@ -129,4 +129,7 @@ set_global_assignment -name SEARCH_PATH ../../../submodules/pulserain_mcu/common
 set_global_assignment -name SEARCH_PATH ../../../submodules/pulserain_mcu/common/step_cyc10
 set_global_assignment -name SEARCH_PATH ../../../submodules/hw_loader/source
 set_global_assignment -name OPTIMIZATION_MODE "AGGRESSIVE PERFORMANCE"
+set_global_assignment -name PLACEMENT_EFFORT_MULTIPLIER 10
+set_global_assignment -name ROUTER_EFFORT_MULTIPLIER 10
+set_global_assignment -name SEED 4
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
