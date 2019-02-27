@@ -15,6 +15,11 @@
 ###############################################################################
 */
 
+
+`include "common.vh"
+`include "debug_coprocessor.vh"
+`include "config.vh"
+
 `default_nettype none
 
 module step_cyc10 (
@@ -243,7 +248,7 @@ module step_cyc10 (
             .ocd_mem_word_out (),        
         
             .ocd_reg_read_addr (5'd2),
-            .ocd_reg_we (1'b0),
+            .ocd_reg_we (cpu_start),
             .ocd_reg_write_addr (5'd2),
             .ocd_reg_write_data (`DEFAULT_STACK_ADDR),
         
