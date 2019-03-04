@@ -41,7 +41,7 @@ module single_port_ram #(parameter ADDR_WIDTH = 14, DATA_WIDTH = 16) (
     genvar i; 
     
     generate
-        if (`MEM_SIZE_IN_BYTES == (48 * 1024)) begin: gen_if_proc
+        if (`SRAM_SIZE_IN_BYTES == (48 * 1024)) begin: gen_if_proc
             for (i = 0; i < (DATA_WIDTH / 8); i = i + 1) begin : gen_for_proc_1st
                 
                  single_port_ram_8bit #(.ADDR_WIDTH (ADDR_WIDTH - 1)) ram_8bit_1st (

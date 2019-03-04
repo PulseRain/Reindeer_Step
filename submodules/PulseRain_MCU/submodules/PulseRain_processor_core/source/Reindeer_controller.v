@@ -34,12 +34,20 @@ module Reindeer_controller (
         input wire                                          reset_n,                      
         input wire                                          sync_reset,
     
-    
+    //=====================================================================
+    // mem_ack
+    //=====================================================================
+        input wire                                          mem_read_ack,
+        input wire                                          mem_write_ack,
+        input wire                                          data_access_write_active,
+        
     //=====================================================================
     // interface for PC init
     //=====================================================================
         input wire                                          start,
         input wire [`PC_BITWIDTH - 1 : 0]                   start_addr,
+    
+   
         
     //=====================================================================
     // interface for instruction fetch
@@ -62,6 +70,7 @@ module Reindeer_controller (
     //=====================================================================
     // LOAD / STORE
     //=====================================================================
+        input wire                                          decode_enable_out,
         input wire                                          decode_ctl_LOAD,
         input wire                                          decode_ctl_STORE,
         input wire                                          decode_ctl_MISC_MEM,
@@ -140,10 +149,17 @@ module Reindeer_controller (
             reg                                             ctl_paused;
             reg                                             ctl_set_interrupt_active;
             reg                                             ctl_set_interrupt_active_reg;
+            reg                                             ctl_back_to_exe;
+            reg                                             ctl_back_to_exe_d1;
+            reg                                             ctl_back_to_exe_d2;            
+            
+            reg                                             fetch_active;
+            reg                                             ctl_error;
             
             reg                                             load_active_reg;
             reg                                             store_active_reg;
             
+           
             reg                                             first_exe;
 
             reg [`XLEN - 1 : 0]                             mem_read_addr_d1;
@@ -159,6 +175,9 @@ module Reindeer_controller (
             
             reg                                             decode_ctl_WFI_d1;
             reg                                             ecall_active;
+            
+            reg                                             mem_read_ack_d1;
+            reg                                             decode_enable_out_d1;
             
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // data path
@@ -200,6 +219,13 @@ module Reindeer_controller (
                         is_interrupt <= 0;
                         ecall_active <= 0;
                         
+                        mem_read_ack_d1 <= 0;
+                        decode_enable_out_d1 <= 0;
+                        ctl_back_to_exe_d1 <= 0;
+                        ctl_back_to_exe_d2 <= 0;
+                        
+                        fetch_active <= 0;
+                        
                     end else begin
                         
                         decode_ctl_WFI_d1 <= decode_ctl_WFI;
@@ -208,6 +234,16 @@ module Reindeer_controller (
                         
                         mem_read_addr_d1  <= mem_read_addr;
             
+                        mem_read_ack_d1      <= mem_read_ack;
+                        decode_enable_out_d1 <= decode_enable_out;
+                        ctl_back_to_exe_d1 <= ctl_back_to_exe;
+                        ctl_back_to_exe_d2 <= ctl_back_to_exe_d1;
+                        
+                        if (ctl_fetch_enable) begin
+                            fetch_active <= 1'b1;
+                        end else if (mem_read_ack) begin
+                            fetch_active <= 0;
+                        end
                         
                         if (data_access_enable) begin
                             if (decode_ctl_WFI_d1) begin
@@ -405,8 +441,9 @@ module Reindeer_controller (
                        S_DECODE = 3, S_FETCH_EXE = 4, S_DECODE_DATA = 5,
                        S_STORE = 6, S_STORE_WAIT = 7, S_LOAD = 8, S_LOAD_WAIT = 9,
                        S_EXCEPTION = 10, S_EXCEPTION_REINIT = 11, S_MUL_DIV = 12,
-                       S_WFI = 13, S_WFI_WAIT = 14;
-            reg [14 : 0] current_state, next_state;
+                       S_WFI = 13, S_WFI_WAIT = 14, S_PRE_WFI = 15;
+                       
+            reg [15 : 0] current_state, next_state;
                   
             // Declare states
             always @(posedge clk, negedge reset_n) begin : state_machine_reg
@@ -450,6 +487,10 @@ module Reindeer_controller (
                 
                 ctl_set_interrupt_active = 0;
                 
+                ctl_back_to_exe = 0;
+                
+                ctl_error = 0;
+                
                 case (1'b1) // synthesis parallel_case 
                     
                     current_state[S_INIT]: begin
@@ -473,11 +514,17 @@ module Reindeer_controller (
                     end
                     
                     current_state [S_DECODE] : begin
-                        ctl_fetch_enable = 1;
-                        next_state [S_FETCH_EXE] = 1'b1;
+                        if (!mem_read_ack) begin
+                            next_state [S_DECODE] = 1'b1;
+                        end else begin
+                            ctl_fetch_enable = 1;
+                            next_state [S_FETCH_EXE] = 1'b1;
+                        end 
                     end
                     
                     current_state [S_FETCH_EXE] : begin
+                        
+                        
                         ctl_fetch_exe_active = 1'b1;
                         
                         ctl_data_access_enable = first_exe & (~ctl_disable_data_access_reg);
@@ -503,15 +550,19 @@ module Reindeer_controller (
                     end
                     
                     current_state [S_DECODE_DATA] : begin
-                        ctl_exe_enable = 1'b1; 
+                        ctl_exe_enable = decode_enable_out | decode_enable_out_d1 | ctl_back_to_exe_d2; 
+                        ctl_disable_data_access = ~ctl_exe_enable;
+                       // ctl_exe_enable = 1'b1;
+                        
+                        ctl_error = ~(decode_enable_out | decode_enable_out_d1 | ctl_back_to_exe_d2);
                         
                         if (decode_ctl_WFI) begin
-                            next_state [S_WFI] = 1'b1;
+                            next_state [S_PRE_WFI] = 1'b1;
                         end 
                         
-                        //else if (decode_ctl_STORE) begin
-                        //    next_state [S_STORE] = 1'b1;
-                        //end 
+                        else if (decode_ctl_STORE & (`STORE_WAIT_FOR_ACK)) begin
+                            next_state [S_STORE] = 1'b1;
+                        end 
                         
                         else if (decode_ctl_LOAD) begin
                             next_state [S_LOAD] = 1'b1; 
@@ -520,9 +571,22 @@ module Reindeer_controller (
                         end 
                         
                         else begin
-                            ctl_fetch_enable = 1'b1; 
+                            ctl_fetch_enable = mem_read_ack | mem_read_ack_d1;
+                          //  ctl_fetch_enable = 1'b1;                            
                             next_state [S_FETCH_EXE] = 1'b1;
+                        end 
+                    end
+                                        
+                    current_state [S_PRE_WFI] : begin
+                        
+                        if (decode_enable_out) begin
+                             ctl_exe_enable = 1'b1;
+                             next_state [S_WFI] = 1'b1;
+                        end else begin
+                             ctl_data_access_enable = 1'b1;
+                             next_state [S_WFI_WAIT] = 1'b1;
                         end
+                    
                     end
                     
                     current_state [S_WFI] : begin
@@ -540,9 +604,13 @@ module Reindeer_controller (
                     end
                     
                     current_state [S_STORE] : begin
-                        ctl_data_access_enable = 1'b1;
-                        ctl_store_active = 1'b1;
-                        next_state [S_STORE_WAIT] = 1'b1;
+                        if (!fetch_active) begin
+                            ctl_data_access_enable = 1'b1;
+                            ctl_store_active = 1'b1;
+                            next_state [S_STORE_WAIT] = 1'b1;
+                        end else begin
+                            next_state [S_STORE] = 1'b1;
+                        end
                     end
                     
                     current_state [S_STORE_WAIT] : begin
@@ -551,6 +619,7 @@ module Reindeer_controller (
                         end else if (store_done) begin
                             ctl_fetch_enable = 1'b1; 
                             ctl_disable_data_access = 1'b1;
+                            ctl_back_to_exe = 1'b1;
                             next_state [S_FETCH_EXE] = 1'b1;
                         end else begin
                             next_state [S_STORE_WAIT] = 1'b1;
@@ -558,9 +627,13 @@ module Reindeer_controller (
                     end
                                         
                     current_state [S_LOAD] : begin
-                        ctl_data_access_enable = 1'b1;
-                        ctl_load_active = 1'b1;
-                        next_state [S_LOAD_WAIT] = 1'b1;
+                        if (!fetch_active) begin 
+                            ctl_data_access_enable = 1'b1;
+                            ctl_load_active = 1'b1;
+                            next_state [S_LOAD_WAIT] = 1'b1;
+                        end else begin
+                            next_state [S_LOAD] = 1'b1;
+                        end
                     end
                     
                     current_state [S_LOAD_WAIT] : begin
@@ -569,6 +642,7 @@ module Reindeer_controller (
                         end else if (load_done) begin
                             ctl_fetch_enable = 1'b1; 
                             ctl_disable_data_access = 1'b1;
+                            ctl_back_to_exe = 1'b1;
                             next_state [S_FETCH_EXE] = 1'b1;
                         end else begin
                             next_state [S_LOAD_WAIT] = 1'b1;
@@ -592,6 +666,7 @@ module Reindeer_controller (
                         end else begin
                             ctl_fetch_enable = 1'b1; 
                             ctl_disable_data_access = 1'b1;
+                            ctl_back_to_exe = 1'b1;
                             next_state [S_FETCH_EXE] = 1'b1;
                         end
                     end

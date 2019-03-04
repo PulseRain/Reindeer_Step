@@ -68,6 +68,7 @@ module Reindeer_memory (
         output  wire  [`XLEN - 1 : 0]                                   word_out,
         
         output  wire  [`MEM_ADDR_BITS - 1 : 0]                          mem_addr,
+        output  wire                                                    mem_read_en,
         output  wire [`XLEN_BYTES - 1 : 0]                              mem_write_en,
         output  wire [`XLEN - 1 : 0]                                    mem_write_data,
         
@@ -149,6 +150,8 @@ module Reindeer_memory (
             assign mem_addr = addr;
             assign mem_write_en = write_en;
             assign mem_write_data = din;
+            
+            assign mem_read_en = ocd_read_enable | code_read_enable | data_read_enable;
         
 endmodule
 

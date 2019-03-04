@@ -66,10 +66,15 @@ module PulseRain_Reindeer_core (
         
         
         output  wire  [`MEM_ADDR_BITS - 1 : 0]                  mem_addr,
+        output  wire                                            mem_read_en,
         output  wire [`XLEN_BYTES - 1 : 0]                      mem_write_en,
         output  wire [`XLEN - 1 : 0]                            mem_write_data,
         
         input   wire [`XLEN - 1 : 0]                            mem_read_data,
+        
+        input   wire                                            mem_write_ack,
+        input   wire                                            mem_read_ack,
+        
         
         output  wire                                            processor_paused
             
@@ -116,6 +121,7 @@ module PulseRain_Reindeer_core (
         wire  [`CSR_BITS - 1 : 0]                       decode_csr;
         wire                                            decode_csr_enable;
         
+        wire                                            decode_enable_out;
         wire                                            decode_ctl_load_X_from_rs1;
         wire                                            decode_ctl_load_Y_from_rs2;
         wire                                            decode_ctl_load_Y_from_imm_12;
@@ -181,7 +187,7 @@ module PulseRain_Reindeer_core (
         wire                                            data_access_ctl_csr_we;
         wire [`CSR_ADDR_BITS - 1 : 0]                   data_access_ctl_csr_write_addr;
         wire [`XLEN - 1 : 0]                            data_access_ctl_csr_write_data;
-        
+        wire                                            data_access_write_active;
         
         wire                                            store_done;
         wire                                            load_done;
@@ -273,13 +279,17 @@ module PulseRain_Reindeer_core (
                 .data_rw_addr (data_access_mem_addr_rw [`MEM_ADDR_BITS + 1 : 2]),
                 .data_write_word (data_access_mem_data_to_write),
                 
-                .enable_out (mem_enable_out),
+                .enable_out (),
                 .word_out (mem_word_out),
                 
                 .mem_addr       (mem_addr),
+                .mem_read_en    (mem_read_en),
                 .mem_write_en   (mem_write_en),
                 .mem_write_data (mem_write_data),
                 .mem_read_data  (mem_read_data));
+        
+            assign mem_enable_out = mem_read_ack;
+        
         
             assign ocd_mem_enable_out = mem_enable_out;
             assign ocd_mem_word_out   = mem_word_out;
@@ -392,6 +402,7 @@ module PulseRain_Reindeer_core (
                 .csr             (decode_csr),
                 .csr_read_enable (decode_csr_enable),
                 
+                .enable_out (decode_enable_out),
                 .IR_out (decode_IR_out),
                 .PC_out (decode_PC_out),
                 
@@ -539,6 +550,11 @@ module PulseRain_Reindeer_core (
                 .mem_data_to_write  (data_access_mem_data_to_write),
                 .mem_addr_rw_out    (data_access_mem_addr_rw),
                 .store_done (store_done),
+                
+                .write_active (data_access_write_active),
+                .mem_read_ack (mem_read_ack),
+                .mem_write_ack (mem_write_ack),
+                
                 .load_done  (load_done),
                 .exception_alignment (exception_alignment),
                 
@@ -556,6 +572,10 @@ module PulseRain_Reindeer_core (
                 .reset_n (reset_n),
                 .sync_reset (sync_reset),
                 
+                .mem_read_ack (mem_read_ack),
+                .mem_write_ack (mem_write_ack),
+                .data_access_write_active (data_access_write_active),
+                
                 .start (start),
                 .start_addr (start_address),
                 
@@ -566,6 +586,7 @@ module PulseRain_Reindeer_core (
                 .mul_div_active    (mul_div_active),
                 .mul_div_done      (mul_div_done),
                 
+                .decode_enable_out   (decode_enable_out),
                 .decode_ctl_LOAD     (decode_ctl_LOAD),
                 .decode_ctl_STORE    (decode_ctl_STORE),
                 .decode_ctl_MISC_MEM (decode_ctl_MISC_MEM),

@@ -88,6 +88,11 @@ module Reindeer_data_access (
         output reg [`XLEN - 1 : 0]                              mem_data_to_write,
         output reg [`XLEN - 1 : 0]                              mem_addr_rw_out,
         output reg                                              store_done,
+        output reg                                              write_active,
+        
+        input  wire                                             mem_read_ack,
+        input  wire                                             mem_write_ack,
+        
         output wire                                             load_done,
         output wire                                             exception_alignment,
         
@@ -169,6 +174,18 @@ module Reindeer_data_access (
                 endcase
             end
      */       
+            
+            always @(posedge clk, negedge reset_n) begin
+                if (!reset_n) begin
+                    write_active <= 0;
+                end else if (mem_we & (~mem_write_ack)) begin
+                    write_active <= 1'b1;
+                end else if (mem_write_ack) begin
+                    write_active <= 1'b1;
+                end
+                
+            end
+     
             always @(*) begin
                 if (width_load_store [1 : 0] == 2'b00) begin
                     width_mask = 4'b0001 << (mem_write_addr[1 : 0]);
@@ -428,9 +445,9 @@ module Reindeer_data_access (
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // FSM
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            localparam S_IDLE = 0, S_EXCEPTION = 1, S_LOAD = 2; 
+            localparam S_IDLE = 0, S_EXCEPTION = 1, S_LOAD = 2, S_STORE = 3; 
             
-            reg [2 : 0] current_state, next_state;
+            reg [3 : 0] current_state, next_state;
                     
             // Declare states
             always @(posedge clk, negedge reset_n) begin : state_machine_reg
@@ -468,8 +485,17 @@ module Reindeer_data_access (
                                     next_state [S_EXCEPTION] = 1'b1;
                                 end else begin
                                     ctl_mem_we = 1'b1;
-                                    //next_state [S_STORE] = 1'b1;
-                                    next_state [S_IDLE] = 1'b1;
+                                    if (`STORE_WAIT_FOR_ACK) begin
+                                        if (mem_write_addr [`REG_SPACE_BIT]) begin
+                                            ctl_store_done = 1'b1;
+                                            next_state [S_IDLE] = 1'b1;
+                                        end else begin
+                                            next_state [S_STORE] = 1'b1;
+                                        end
+                                        
+                                    end else begin
+                                        next_state [S_IDLE] = 1'b1;
+                                    end
                                 end
                             end else if (load_active) begin
                                 if (unaligned_read) begin
@@ -502,6 +528,16 @@ module Reindeer_data_access (
                             next_state [S_LOAD] = 1'b1;
                         end
                     end
+                    
+                    current_state [S_STORE] : begin
+                        if (mem_write_ack) begin
+                            ctl_store_done = 1'b1;
+                            next_state [S_IDLE] = 1'b1;
+                        end else begin
+                            next_state [S_STORE] = 1'b1;
+                        end
+                    end
+                    
                     
                     default: begin
                         next_state[S_IDLE] = 1'b1;

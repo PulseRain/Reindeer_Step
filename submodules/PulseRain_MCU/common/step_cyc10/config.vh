@@ -23,14 +23,19 @@
 //  memory size 
 //----------------------------------------------------------------------------
 
-`define MEM_SIZE_IN_BYTES   (32 * 1024)
-`define MEM_ADDR_BITS       ($clog2(`MEM_SIZE_IN_BYTES / 4))
+`define SRAM_SIZE_IN_BYTES   (32 * 1024)
+`define DRAM_SIZE_IN_BYTES   (8 * 1024 * 1024)
+
+`define SRAM_ADDR_BITS       ($clog2(`SRAM_SIZE_IN_BYTES / 4))
+`define DRAM_ADDR_BITS       ($clog2(`DRAM_SIZE_IN_BYTES / 4))
+
+`define MEM_ADDR_BITS        (`DRAM_ADDR_BITS + 1)
 
 
 `define MM_REG_SIZE_IN_BYTES   (32)
 `define MM_REG_ADDR_BITS       ($clog2(`MM_REG_SIZE_IN_BYTES / 4))
 
-`define DEFAULT_STACK_ADDR    (((`MEM_SIZE_IN_BYTES) - 8)| 32'h80000000)
+`define DEFAULT_STACK_ADDR    (((`SRAM_SIZE_IN_BYTES) - 8)| 32'h80000000)
 //----------------------------------------------------------------------------
 //  clock 
 //----------------------------------------------------------------------------
@@ -56,6 +61,7 @@
 //----------------------------------------------------------------------------
 //  hardware mul/div
 //----------------------------------------------------------------------------
+`define STORE_WAIT_FOR_ACK                  (1'b1)
 
 `define DISABLE_OCD                         0
 

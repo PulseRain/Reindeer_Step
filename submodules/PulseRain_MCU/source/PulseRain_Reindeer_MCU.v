@@ -80,13 +80,13 @@ module PulseRain_Reindeer_MCU (
         wire [`MEM_ADDR_BITS - 1 : 0]                           mem_addr;
         reg  [`MEM_ADDR_BITS - 1 : 0]                           mem_addr_d1;
         
+        wire                                                    mem_read_en;
         wire [`XLEN_BYTES - 1 : 0]                              mem_write_en;
         wire [`XLEN - 1 : 0]                                    mem_write_data;
         wire [`XLEN - 1 : 0]                                    mem_read_data;
-            
-        wire [15 : 0]                                           dout_high;
-        wire [15 : 0]                                           dout_low;
-        
+        wire                                                    mem_write_ack;
+        wire                                                    mem_read_ack;
+                        
         wire                                                    start_TX;
         wire [7 : 0]                                            tx_data;
         wire                                                    tx_active;
@@ -125,15 +125,34 @@ module PulseRain_Reindeer_MCU (
                 .peek_ir (peek_ir),
                 
                 .mem_addr (mem_addr),
+                .mem_read_en (mem_read_en),
                 .mem_write_en (mem_write_en),
                 .mem_write_data (mem_write_data),
                 .mem_read_data (mem_read_data),
+                .mem_write_ack (mem_write_ack),
+                .mem_read_ack (mem_read_ack),
                 .processor_paused (processor_paused));
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // memory 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            single_port_ram #(.ADDR_WIDTH (`MEM_ADDR_BITS), .DATA_WIDTH (16) ) ram_high_i (
+        mem_controller mem_controller_i (
+            .clk        (clk),
+            .reset_n    (reset_n),
+            .sync_reset (sync_reset),
+            
+            .mem_addr       (mem_addr),
+            .mem_read_en    (mem_read_en),
+            .mem_write_en   (mem_write_en),
+            .mem_write_data (mem_write_data),
+            .mem_read_data  (mem_read_data),
+            
+            .mem_write_ack  (mem_write_ack),
+            .mem_read_ack   (mem_read_ack));  
+          
+          
+          
+          /*  single_port_ram #(.ADDR_WIDTH (`MEM_ADDR_BITS), .DATA_WIDTH (16) ) ram_high_i (
                 .addr (mem_addr),
                 .din (mem_write_data [31 : 16]),
                 .write_en (mem_write_en[3 : 2]),
@@ -146,7 +165,7 @@ module PulseRain_Reindeer_MCU (
                 .write_en (mem_write_en[1 : 0]),
                 .clk (clk),
                 .dout (dout_low));
-      
+   */   
    /*
       
           single_port_ram_sim_high #(.ADDR_WIDTH (`MEM_ADDR_BITS), .DATA_WIDTH (16) ) ram_high_i (
@@ -166,7 +185,7 @@ module PulseRain_Reindeer_MCU (
       
            // assign mem_read_data = {(`UART_TX_ADDR == {mem_addr_d1 [`MEM_ADDR_BITS - 1 : 0], 2'b00}) ? tx_active : dout_high[15], dout_high [14 : 0], dout_low};
             
-           assign mem_read_data = {dout_high, dout_low};
+           //assign mem_read_data = {dout_high, dout_low};
         
             always @(posedge clk, negedge reset_n) begin 
                 if (!reset_n) begin

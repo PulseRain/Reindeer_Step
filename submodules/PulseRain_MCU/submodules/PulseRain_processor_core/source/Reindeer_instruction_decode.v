@@ -56,6 +56,7 @@ module Reindeer_instruction_decode (
      // interface for next stage
      //=====================================================================
 
+        output reg                                              enable_out,
         output reg [`XLEN - 1 : 0]                              IR_out,
         output reg [`PC_BITWIDTH - 1 : 0]                       PC_out,
         
@@ -137,7 +138,9 @@ module Reindeer_instruction_decode (
                 if (!reset_n) begin
                     IR_out <= 0;
                     PC_out <= 0;
+                    enable_out <= 0;
                 end else begin
+                    enable_out <= enable_in;
                     IR_out <= IR_in;
                     PC_out <= PC_in;
                 end

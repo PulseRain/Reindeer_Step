@@ -69,6 +69,7 @@ module Reindeer_fetch_instruction (
             reg                                             read_mem_enable_d1;
             
             reg [`PC_BITWIDTH - 1 : 0]                      PC_out_i;
+            reg                                             read_active;
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // data path
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -81,6 +82,7 @@ module Reindeer_fetch_instruction (
                         read_mem_enable    <= 0;
                         read_mem_addr      <= 0;
                         read_mem_enable_d1 <= 0;
+                        read_active <= 0;
                     end else begin
                         read_mem_enable    <= ctl_read_mem_enable;
                         read_mem_enable_d1 <= read_mem_enable;
@@ -89,6 +91,12 @@ module Reindeer_fetch_instruction (
                             read_mem_addr <= start_addr;
                         end else if (ctl_inc_read_addr) begin
                             read_mem_addr <= read_mem_addr + 4;
+                        end
+                        
+                        if (ctl_read_mem_enable) begin
+                            read_active <= 1'b1;
+                        end else if (mem_read_done) begin
+                            read_active <= 0;
                         end
                         
                     end
@@ -112,7 +120,8 @@ module Reindeer_fetch_instruction (
                             PC_out_i <= read_mem_addr;
                         end
                         
-                        if (mem_read_done & read_mem_enable_d1) begin
+                        //if (mem_read_done & read_mem_enable_d1) begin
+                        if (mem_read_done & read_active) begin
                             IR_out <= mem_data;
                         end
                     end
