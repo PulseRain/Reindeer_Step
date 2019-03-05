@@ -2,7 +2,7 @@ set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../mem
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../memory/Intel/cyclone10_LP/single_port_ram.v"]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../memory/Intel/cyclone10_LP/single_port_ram_8bit.v"]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../memory/SDRAM/sdram_controller.sv"]
-set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../memory/mem_controller.sv"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../memory/mem_controller.v"]
 
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../peripherals/UART/UART_TX.v"]
 
