@@ -23,7 +23,7 @@
 //  memory size 
 //----------------------------------------------------------------------------
 
-`define SRAM_SIZE_IN_BYTES   (32 * 1024)
+`define SRAM_SIZE_IN_BYTES   (48 * 1024)
 `define DRAM_SIZE_IN_BYTES   (8 * 1024 * 1024)
 
 `define SRAM_ADDR_BITS       ($clog2(`SRAM_SIZE_IN_BYTES / 4))
@@ -61,7 +61,7 @@
 //----------------------------------------------------------------------------
 //  hardware mul/div
 //----------------------------------------------------------------------------
-`define STORE_WAIT_FOR_ACK                  (1'b1)
+`define STORE_WAIT_FOR_ACK                  (1'b0)
 
 `define DISABLE_OCD                         0
 
