@@ -30,6 +30,7 @@
 
 `define SRAM_SIZE_IN_BYTES   (0 * 1024)
 `define DRAM_SIZE_IN_BYTES   (8 * 1024 * 1024)
+`define DRAM_RW_BUFFER_SIZE  (1024/4)
 
 `define SRAM_ADDR_BITS       ((`SRAM_SIZE_IN_BYTES == 0) ? 1 : ($clog2(`SRAM_SIZE_IN_BYTES / 4)))
 

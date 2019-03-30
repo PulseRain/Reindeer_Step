@@ -21,7 +21,7 @@
 `default_nettype none
 
 
-module dram_rw_buffer #(parameter BUFFER_SIZE = 4) (
+module dram_rw_buffer #(parameter BUFFER_SIZE = `DRAM_RW_BUFFER_SIZE) (
 
     //=======================================================================
     // clock / reset
