@@ -32,8 +32,6 @@ module PulseRain_Reindeer_core (
     //=====================================================================
     // Interface Onchip Debugger
     //=====================================================================
-      //==  input   wire                                            run1_pause0,
-
         input   wire                                            ocd_read_enable,
         input   wire                                            ocd_write_enable,
         
@@ -76,8 +74,13 @@ module PulseRain_Reindeer_core (
         input   wire                                            mem_read_ack,
         
         
-        output  wire                                            processor_paused
-            
+        output  wire                                            processor_paused,
+ 
+    //=====================================================================
+    // DRAM interface
+    //=====================================================================
+        input   wire                                            dram_rw_pending,
+        input   wire  [`MEM_ADDR_BITS - 1 : 0]                  mem_addr_ack
 );
      
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -380,7 +383,9 @@ module PulseRain_Reindeer_core (
                 .mem_data (mem_word_out),
                 
                 .read_mem_enable (fetch_read_mem_enable),
-                .read_mem_addr (fetch_read_mem_addr));
+                .read_mem_addr (fetch_read_mem_addr),
+                .dram_rw_pending (dram_rw_pending),
+                .mem_addr_ack (mem_addr_ack));
 
         //---------------------------------------------------------------------
         // instruction decode
@@ -603,6 +608,7 @@ module PulseRain_Reindeer_core (
                 .jal_addr        (exe_jal_addr),
                               
                 .load_active     (exe_load_active),
+                .store_active    (exe_store_active),
                 .data_to_store   (exe_data_to_store),
                 .mem_write_addr  (exe_mem_write_addr),
                 .mem_read_addr   (exe_mem_read_addr),
@@ -630,10 +636,12 @@ module PulseRain_Reindeer_core (
                 .activate_exception           (activate_exception),
                 .exception_PC                 (exception_PC),
                 .exception_addr               (exception_addr),
-                .paused                       (paused)
+                .paused                       (paused),
+                
+                .dram_rw_pending              (dram_rw_pending)
                 
                 );
-
+            
 //----------------------------------------------------------------------------
 // DEBUG
 //----------------------------------------------------------------------------
