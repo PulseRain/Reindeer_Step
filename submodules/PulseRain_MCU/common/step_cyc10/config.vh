@@ -41,7 +41,7 @@
 `define MM_REG_SIZE_IN_BYTES   (32)
 `define MM_REG_ADDR_BITS       ($clog2(`MM_REG_SIZE_IN_BYTES / 4))
 
-`define DEFAULT_STACK_ADDR    (((`SRAM_SIZE_IN_BYTES) - 8)| 32'h80000000)
+`define DEFAULT_STACK_ADDR    ((`SRAM_SIZE_IN_BYTES == 0) ? (((`DRAM_SIZE_IN_BYTES) - 8)| 32'h80000000)  : (((`SRAM_SIZE_IN_BYTES) - 8)| 32'h80000000)) 
 //----------------------------------------------------------------------------
 //  clock 
 //----------------------------------------------------------------------------
