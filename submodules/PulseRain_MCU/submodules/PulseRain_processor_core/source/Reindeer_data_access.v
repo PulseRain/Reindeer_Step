@@ -178,7 +178,7 @@ module Reindeer_data_access (
             always @(posedge clk, negedge reset_n) begin
                 if (!reset_n) begin
                     write_active <= 0;
-                end else if (mem_we & (~mem_write_ack)) begin
+                end else if ((|mem_we) & (~mem_write_ack)) begin
                     write_active <= 1'b1;
                 end else if (mem_write_ack) begin
                     write_active <= 1'b1;
