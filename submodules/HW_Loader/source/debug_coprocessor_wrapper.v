@@ -35,7 +35,7 @@ module debug_coprocessor_wrapper #(parameter BAUD_PERIOD=208) (
         input  wire [`DEBUG_DATA_WIDTH * `DEBUG_FRAME_DATA_LEN - 1 : 0]             pram_read_data_in,
     
         output wire                                                                 pram_read_enable_out,
-        output wire [`DEBUG_PRAM_ADDR_WIDTH - 1 : 0]                                pram_read_addr_out,
+        output wire [`DEBUG_PRAM_ADDR_WIDTH - 3 : 0]                                pram_read_addr_out,
     
         
         output wire                                                                 pram_write_enable_out,
