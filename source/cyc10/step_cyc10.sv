@@ -87,60 +87,65 @@ module step_cyc10 (
     // Signal
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     
-        wire                        clk_100MHz;
-        wire                        clk_100MHz_shift;
-        wire                        clk_12MHz;
+        wire                                    clk_100MHz;
+        wire                                    clk_100MHz_shift;
+        wire                                    clk_12MHz;
 
-        wire                        pll_locked;
-        
-        wire                        mem_cs;
-        wire unsigned [3 : 0]       mem_byteenable;
-        wire                        mem_read0_write1;
-        wire unsigned [21 : 0]      mem_addr;
-        wire unsigned [31 : 0]      mem_write_data;
-        wire                        mem_ack;
-        wire unsigned [31 : 0]      mem_read_data;
-        
-        wire unsigned [21 : 0]      sdram_slave_address;
-        wire unsigned [1 : 0]       sdram_slave_byteenable_n;
-        wire                        sdram_slave_chipselect;
-        wire unsigned [15 : 0]      sdram_slave_writedata;
-        wire                        sdram_slave_read_n;
-        wire                        sdram_slave_write_n;
-        wire unsigned [15 : 0]      sdram_slave_readdata;
-        wire                        sdram_slave_waitrequest;
-        wire                        sdram_slave_readdatavalid;
+        wire                                    pll_locked;
+                
+        wire unsigned [21 : 0]                  sdram_slave_address;
+        wire unsigned [1 : 0]                   sdram_slave_byteenable_n;
+        wire                                    sdram_slave_chipselect;
+        wire unsigned [15 : 0]                  sdram_slave_writedata;
+        wire                                    sdram_slave_read_n;
+        wire                                    sdram_slave_write_n;
+        wire unsigned [15 : 0]                  sdram_slave_readdata;
+        wire                                    sdram_slave_waitrequest;
+        wire                                    sdram_slave_readdatavalid;
     
-        wire                        uart_tx_ocd;
-        wire                        uart_tx_cpu;
+        wire                                    uart_tx_ocd;
+        wire                                    uart_tx_cpu;
         
-        wire                        ocd_read_enable;
-        wire                        ocd_write_enable;
+        wire                                    ocd_read_enable;
+        wire                                    ocd_write_enable;
 
-        wire  [23 : 0]              ocd_rw_addr;
-        wire  [31 : 0]              ocd_write_word;
+        wire  [`MEM_ADDR_BITS - 1 : 0]          ocd_rw_addr;
+        wire  [`XLEN - 1 : 0]                   ocd_write_word;
 
-        wire                        ocd_mem_enable_out;
-        wire  [31 : 0]              ocd_mem_word_out;      
+        wire                                    ocd_mem_enable_out;
+        wire  [`XLEN - 1 : 0]                   ocd_mem_word_out;      
 
-        wire                        debug_uart_tx_sel_ocd1_cpu0;
-        wire                        cpu_reset;
-        wire [23 : 0]               pram_read_addr;
-        wire [23 : 0]               pram_write_addr;
+        wire                                    debug_uart_tx_sel_ocd1_cpu0;
+        wire                                    cpu_reset;
+        wire  [`DEBUG_PRAM_ADDR_WIDTH - 3 : 0]  pram_read_addr;
+        wire  [`DEBUG_PRAM_ADDR_WIDTH - 3 : 0]  pram_write_addr;
         
-        wire                        cpu_start;
-        wire [31 : 0]               cpu_start_addr;
+        wire                                    cpu_start;
+        wire  [`XLEN - 1 : 0]                   cpu_start_addr;
        
-        wire                        processor_paused;
-        wire                        processor_active;
+        wire                                    processor_paused;
+        wire                                    processor_active;
         
-        wire [255:0]                acq_data_in;
+        logic unsigned [1 : 0]                  init_start = 0;
+        logic                                   actual_cpu_start;
+        logic unsigned [`XLEN - 1 : 0]          actual_start_addr;
+        
+        
+        wire                                    dram_ack;
+        wire  [`XLEN - 1 : 0]                   dram_mem_read_data;
+        
+        wire  [`MEM_ADDR_BITS - 1 : 0]          dram_mem_addr;
+        wire                                    dram_mem_read_en;
+        wire                                    dram_mem_write_en;
+        wire  [`XLEN_BYTES - 1 : 0]             dram_mem_byte_enable;
+        wire  [`XLEN - 1 : 0]                   dram_mem_write_data;
+        
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // PLL
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         PLL pll_i (
-            .areset(1'b0),
+            .areset(~reset_n),
             .inclk0 (osc_in),  // 50MHz clock in
             .c0 (clk_100MHz),
             .c1 (clk_100MHz_shift),
@@ -157,7 +162,8 @@ module step_cyc10 (
             .outclock (clk_100MHz_shift),
             .dataout (SDRAM_CLK)
         );
-
+        
+        
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // SDRAM, ISSI - IS42S16400J
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -198,17 +204,14 @@ module step_cyc10 (
                 //=====================================================================
                 // memory interface
                 //=====================================================================
-                    //.mem_cs (mem_cs),
-                    .mem_cs (ocd_write_enable | ocd_read_enable),
-                    //==.mem_byteenable (mem_byteenable),
-                    .mem_byteenable (4'b1111),
-                    //==.mem_read0_write1 (mem_read0_write1),
-                    .mem_read0_write1 (ocd_write_enable),
-                    .mem_addr (mem_addr),
-                    .mem_write_data (mem_write_data),
+                    .mem_cs (dram_mem_read_en | dram_mem_write_en),
+                    .mem_byteenable (dram_mem_byte_enable),
+                    .mem_read0_write1 (dram_mem_write_en),
+                    .mem_addr ({dram_mem_addr, 1'b0}),
+                    .mem_write_data (dram_mem_write_data),
 
-                    .mem_ack (mem_ack),
-                    .mem_read_data (mem_read_data),
+                    .mem_ack (dram_ack),
+                    .mem_read_data (dram_mem_read_data),
 
                 //=====================================================================
                 // SDRAM Avalon Bus
@@ -226,12 +229,25 @@ module step_cyc10 (
             );
 
 
-
-
-
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // MCU
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+        always_ff @(posedge clk_100MHz, negedge pll_locked) begin
+            if (!pll_locked) begin
+                init_start <= 0;
+                actual_cpu_start <= 0;
+                actual_start_addr <= 0;
+            end else begin
+                init_start <= {init_start [$high(init_start) - 1 : 0], 1'b1};
+                actual_cpu_start <= cpu_start | ((~init_start [$high(init_start)]) & init_start [$high(init_start) - 1]);
+                if (cpu_start) begin
+                    actual_start_addr <= cpu_start_addr;
+                end else if (!init_start [$high(init_start)]) begin
+                    actual_start_addr <= `DEFAULT_START_ADDR;
+                end
+            end
+        end
      
         PulseRain_Reindeer_MCU PulseRain_Reindeer_MCU_i (
             .clk (clk_100MHz),
@@ -244,8 +260,8 @@ module step_cyc10 (
             .ocd_rw_addr (ocd_rw_addr),
             .ocd_write_word (ocd_write_word),
             
-            .ocd_mem_enable_out (),
-            .ocd_mem_word_out (),        
+            .ocd_mem_enable_out (ocd_mem_enable_out),
+            .ocd_mem_word_out (ocd_mem_word_out),        
         
             .ocd_reg_read_addr (5'd2),
             .ocd_reg_we (cpu_start),
@@ -254,22 +270,31 @@ module step_cyc10 (
         
             .TXD (uart_tx_cpu),
     
-            .start (cpu_start),
-            .start_address (cpu_start_addr),
+            .start (actual_cpu_start),
+            .start_address (actual_start_addr),
         
             .processor_paused (processor_paused),
+    
+            .dram_ack             (dram_ack),
+            .dram_mem_read_data   (dram_mem_read_data),
             
+            .dram_mem_addr        (dram_mem_addr),
+            .dram_mem_read_en     (dram_mem_read_en),
+            .dram_mem_write_en    (dram_mem_write_en),
+            .dram_mem_byte_enable (dram_mem_byte_enable),
+            .dram_mem_write_data  (dram_mem_write_data),
+    
             .peek_pc (),
-            .peek_ir () );
+            .peek_ir (),
+            .peek_mem_write_en   (),
+            .peek_mem_write_data (),
+            .peek_mem_addr       ());
      
         assign processor_active = ~processor_paused;
             
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Hardware Loader
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        assign mem_addr = ocd_write_enable ? {pram_write_addr[21:0], 1'b0} : {pram_read_addr[21:0], 1'b0};
-        assign mem_write_data = ocd_write_word;
-        assign ocd_mem_word_out = mem_read_data;
         
         debug_coprocessor_wrapper #(.BAUD_PERIOD (868)) hw_loader_i (
                     .clk (clk_100MHz),
@@ -296,7 +321,6 @@ module step_cyc10 (
                     .debug_uart_tx_sel_ocd1_cpu0 (debug_uart_tx_sel_ocd1_cpu0));
                 
     assign ocd_rw_addr = ocd_read_enable ? pram_read_addr : pram_write_addr;        
-    assign ocd_mem_enable_out = mem_ack;
     
     always_ff @(posedge clk_100MHz, negedge pll_locked) begin : uart_proc
         if (!pll_locked) begin
