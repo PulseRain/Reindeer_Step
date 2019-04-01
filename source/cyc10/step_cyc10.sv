@@ -296,7 +296,7 @@ module step_cyc10 (
     // Hardware Loader
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         
-        debug_coprocessor_wrapper #(.BAUD_PERIOD (868)) hw_loader_i (
+        debug_coprocessor_wrapper #(.BAUD_PERIOD (108)) hw_loader_i (
                     .clk (clk_100MHz),
                     .reset_n (pll_locked),
                     
