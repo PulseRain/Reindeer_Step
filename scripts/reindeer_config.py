@@ -482,12 +482,14 @@ class Reindeer_OCD:
             if (len(data_list_to_write) == 0):
                 data_list_to_write = record.data_list
                 addr = record.address
-            elif ((addr + len(data_list_to_write)) == record.address):
+            elif (((addr + len(data_list_to_write)) == record.address) and (len(data_list_to_write) < 8192)):
                 data_list_to_write = data_list_to_write + record.data_list
                 #print ("----------------------------- ", [hex(k) for k in  data_list_to_write])
                 count = count + 1
-                if ((count % 8) == 0):
+                #print ("%x, %x" % (addr, record.address))
+                if ((count % 512) == 0):
                     print ("#", end="")
+                    sys.stdout.flush()
             else:
                 if (len(data_list_to_write) % 4):
                     data_list_to_write = data_list_to_write + [0] * (len(data_list_to_write) % 4)
@@ -599,7 +601,7 @@ if __name__ == "__main__":
     
     print ("===============================================================================")
     print ("# Copyright (c) 2019, PulseRain Technology LLC ")
-    print ("# Reindeer Configuration Utility, Version 2.0")
+    print ("# Reindeer Configuration Utility, Version 2.1")
     
     
     #=========================================================================
