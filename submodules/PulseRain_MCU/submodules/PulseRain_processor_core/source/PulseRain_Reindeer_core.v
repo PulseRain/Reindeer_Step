@@ -47,12 +47,27 @@ module PulseRain_Reindeer_core (
         input   wire  [`XLEN - 1 : 0]                           ocd_reg_write_data,
 
     //=====================================================================
-    // UARAT
+    // External Interrupt
     //=====================================================================
-        output wire                                             start_TX,
-        output wire [7 : 0]                                     tx_data,
-        input  wire                                             tx_active,
+        input   wire                                            ext_int_triggered,
         
+    //=======================================================================
+    // Wishbone Host Interface 
+    //=======================================================================
+        output wire                                             WB_RD_CYC_O,
+        output wire                                             WB_RD_STB_O,
+        output wire  unsigned [`MM_REG_ADDR_BITS - 1 : 0]       WB_RD_ADR_O,
+        input  wire  unsigned [`XLEN - 1 : 0]                   WB_RD_DAT_I,
+        input  wire                                             WB_RD_ACK_I,
+        
+        output wire                                             WB_WR_CYC_O,
+        output wire                                             WB_WR_STB_O,
+        output wire                                             WB_WR_WE_O,
+        output wire unsigned [`XLEN_BYTES - 1 : 0]              WB_WR_SEL_O,
+        output wire unsigned [`MM_REG_ADDR_BITS - 1 : 0]        WB_WR_ADR_O,
+        output wire unsigned [`XLEN - 1 : 0]                    WB_WR_DAT_O,
+        input  wire                                             WB_WR_ACK_I,
+    
     //=====================================================================
     // Interface for init/start
     //=====================================================================
@@ -72,7 +87,6 @@ module PulseRain_Reindeer_core (
         
         input   wire                                            mem_write_ack,
         input   wire                                            mem_read_ack,
-        
         
         output  wire                                            processor_paused,
  
@@ -221,7 +235,7 @@ module PulseRain_Reindeer_core (
 
                 
         wire                                            mm_reg_re;
-        wire                                            mm_reg_we;
+        wire [`XLEN_BYTES - 1 : 0]                      mm_reg_we;
         
         wire [`XLEN - 1 : 0]                            mm_reg_data_to_write;
         wire [`MM_REG_ADDR_BITS - 1 : 0]                mm_reg_addr_rw;
@@ -231,8 +245,11 @@ module PulseRain_Reindeer_core (
         
         wire                                            timer_triggered;
         wire                                            mtie_out;
+        wire                                            meie_out;        
         wire                                            mie_out;
         wire                                            mtip_out;
+        wire                                            meip_out;
+
         wire                                            is_interrupt;
         
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -251,13 +268,23 @@ module PulseRain_Reindeer_core (
                 .data_rw_addr (mm_reg_addr_rw),
                 .data_write_word (mm_reg_data_to_write),
                 
+                .WB_RD_CYC_O (WB_RD_CYC_O),
+                .WB_RD_STB_O (WB_RD_STB_O),
+                .WB_RD_ADR_O (WB_RD_ADR_O),
+                .WB_RD_DAT_I (WB_RD_DAT_I),
+                .WB_RD_ACK_I (WB_RD_ACK_I),
+                
+                .WB_WR_CYC_O (WB_WR_CYC_O),
+                .WB_WR_STB_O (WB_WR_STB_O),
+                .WB_WR_WE_O  (WB_WR_WE_O),
+                .WB_WR_SEL_O (WB_WR_SEL_O),
+                .WB_WR_ADR_O (WB_WR_ADR_O),
+                .WB_WR_DAT_O (WB_WR_DAT_O),
+                .WB_WR_ACK_I (WB_WR_ACK_I),
+        
                 .enable_out (mm_reg_enable_out),
                 .word_out (mm_reg_word_out),
-                
-                .start_TX (start_TX),
-                .tx_data (tx_data),
-                .tx_active (tx_active),
-
+        
                 .timer_triggered (timer_triggered));
 
         //---------------------------------------------------------------------
@@ -347,7 +374,8 @@ module PulseRain_Reindeer_core (
                 .write_addr    (data_access_ctl_csr_write_addr),
                 .write_data_in (data_access_ctl_csr_write_data),
                 
-                .timer_triggered (timer_triggered),
+                .timer_triggered     (timer_triggered),
+                .ext_int_triggered   (ext_int_triggered),
                 
                 .activate_exception (activate_exception),
                 .is_interrupt       (is_interrupt),
@@ -360,7 +388,8 @@ module PulseRain_Reindeer_core (
                 .mepc_out  (mepc_value),
                 .mtie_out  (mtie_out),
                 .mie_out   (mie_out),
-                .mtip_out  (mtip_out));
+                .mtip_out  (mtip_out),
+                .meip_out  (meip_out));
             
         //---------------------------------------------------------------------
         // fetch instruction
@@ -631,6 +660,7 @@ module PulseRain_Reindeer_core (
                 .exception_ebreak             (exception_ebreak),
                 .exception_alignment          (exception_alignment),
                 .timer_triggered              (mtip_out & mtie_out & mie_out),
+                .ext_int_triggered              (meip_out & meie_out & mie_out),
                 .is_interrupt                 (is_interrupt),
                 .exception_code               (exception_code),
                 .activate_exception           (activate_exception),
