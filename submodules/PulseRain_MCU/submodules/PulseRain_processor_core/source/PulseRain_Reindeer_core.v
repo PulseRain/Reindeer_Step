@@ -660,7 +660,7 @@ module PulseRain_Reindeer_core (
                 .exception_ebreak             (exception_ebreak),
                 .exception_alignment          (exception_alignment),
                 .timer_triggered              (mtip_out & mtie_out & mie_out),
-                .ext_int_triggered              (meip_out & meie_out & mie_out),
+                .ext_int_triggered            (meip_out & meie_out & mie_out),
                 .is_interrupt                 (is_interrupt),
                 .exception_code               (exception_code),
                 .activate_exception           (activate_exception),
