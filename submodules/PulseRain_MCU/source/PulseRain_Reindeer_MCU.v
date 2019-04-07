@@ -51,8 +51,13 @@ module PulseRain_Reindeer_MCU (
     //=====================================================================
     // UART
     //=====================================================================
+        input   wire                                            RXD,
         output  wire                                            TXD,
-        
+    
+    //=====================================================================
+    // GPIO
+    //=====================================================================
+        output  wire  unsigned [`NUM_OF_GPIOS - 1 : 0]          GPIO_OUT,
     //=====================================================================
     // Interface for init/start
     //=====================================================================
@@ -105,6 +110,20 @@ module PulseRain_Reindeer_MCU (
         wire                                                    dram_rw_pending;
         wire  [`MEM_ADDR_BITS - 1 : 0]                          mem_addr_ack;
         
+        wire                                                    WB_RD_CYC;
+        wire                                                    WB_RD_STB;
+        wire  unsigned [`MM_REG_ADDR_BITS - 1 : 0]              WB_RD_ADR;
+        wire  unsigned [`XLEN - 1 : 0]                          WB_RD_DAT;
+        wire                                                    WB_RD_ACK;
+        
+        wire                                                    WB_WR_CYC;
+        wire                                                    WB_WR_STB;
+        wire                                                    WB_WR_WE;
+        wire unsigned [`XLEN_BYTES - 1 : 0]                     WB_WR_SEL;
+        wire unsigned [`MM_REG_ADDR_BITS - 1 : 0]               WB_WR_ADR;
+        wire unsigned [`XLEN - 1 : 0]                           WB_WR_DAT;
+        wire                                                    WB_WR_ACK;
+        
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // processor core
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -127,11 +146,23 @@ module PulseRain_Reindeer_MCU (
                 .ocd_reg_we (ocd_reg_we),
                 .ocd_reg_write_addr (ocd_reg_write_addr),
                 .ocd_reg_write_data (ocd_reg_write_data),
-
-                .start_TX  (start_TX),
-                .tx_data   (tx_data),
-                .tx_active (tx_active),
-
+                
+                .ext_int_triggered (1'b0),
+                
+                .WB_RD_CYC_O (WB_RD_CYC),
+                .WB_RD_STB_O (WB_RD_STB),
+                .WB_RD_ADR_O (WB_RD_ADR),
+                .WB_RD_DAT_I (WB_RD_DAT),
+                .WB_RD_ACK_I (WB_RD_ACK),
+                
+                .WB_WR_CYC_O (WB_WR_CYC),
+                .WB_WR_STB_O (WB_WR_STB),
+                .WB_WR_WE_O  (WB_WR_WE),
+                .WB_WR_SEL_O (WB_WR_SEL),
+                .WB_WR_ADR_O (WB_WR_ADR),
+                .WB_WR_DAT_O (WB_WR_DAT),
+                .WB_WR_ACK_I (WB_WR_ACK),
+    
                 .start (start),
                 .start_address (start_address),
                 
@@ -190,20 +221,30 @@ module PulseRain_Reindeer_MCU (
     // peripherals 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         
-        /* verilator lint_off WIDTH */
+       peripherals peripherals_i (
+            .clk                (clk),
+            .reset_n            (reset_n),
+            .sync_reset         (sync_reset),
         
-        UART_TX #(.STABLE_TIME(`UART_STABLE_COUNT), .BAUD_PERIOD_BITS(`UART_TX_BAUD_PERIOD_BITS)) UART_TX_i (
-            .clk (clk),
-            .reset_n (reset_n),
-            .sync_reset (sync_reset),
+            .INTx               (2'b00),
+        
+            .WB_RD_STB_I (WB_RD_STB),
+            .WB_RD_ADR_I (WB_RD_ADR),
+            .WB_RD_DAT_O (WB_RD_DAT),
+            .WB_RD_ACK_O (WB_RD_ACK),
             
-            .start_TX (start_TX),
-            .baud_rate_period_m1 ((`UART_TX_BAUD_PERIOD_BITS)'(`UART_TX_BAUD_PERIOD - 1)),
-            .SBUF_in (tx_data),
-            .tx_active (tx_active),
-            .TXD (TXD));
+            .WB_WR_STB_I (WB_WR_STB),
+            .WB_WR_WE_I  (WB_WR_WE),
+            .WB_WR_SEL_I (WB_WR_SEL),
+            .WB_WR_ADR_I (WB_WR_ADR),
+            .WB_WR_DAT_I (WB_WR_DAT),
+            .WB_WR_ACK_O (WB_WR_ACK),
         
+            .RXD         (RXD),
+            .TXD         (TXD),
         
+            .gpio_out    (GPIO_OUT));
+  
         assign  peek_mem_write_en   = mem_write_en;
         assign  peek_mem_write_data = mem_write_data;
         assign  peek_mem_addr       = mem_addr;    
