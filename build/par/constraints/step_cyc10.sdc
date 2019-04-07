@@ -63,11 +63,11 @@ set_clock_groups \
 
 set_output_delay -clock [get_clocks {PLL:pll_i|altpll:altpll_component|PLL_altpll:auto_generated|wire_pll1_clk[1]}] \
         -max 1.55 -reference_pin [get_ports SDRAM_CLK] \
-        [get_ports {SDRAM_CS_N SDRAM_RAS_N SDRAM_CAS_N SDRAM_WE_N SDRAM_DQM[*] SDRAM_ADDR[*] SDRAM_CKE SDRAM_BA SDRAM_DQ[*]}]
+        [get_ports {SDRAM_CS_N SDRAM_RAS_N SDRAM_CAS_N SDRAM_WE_N SDRAM_DQM[*] SDRAM_ADDR[*] SDRAM_CKE SDRAM_BA[*] SDRAM_DQ[*]}]
 
 set_output_delay -clock [get_clocks {PLL:pll_i|altpll:altpll_component|PLL_altpll:auto_generated|wire_pll1_clk[1]}] \
         -min -0.85 -reference_pin [get_ports SDRAM_CLK] \
-        [get_ports {SDRAM_CS_N SDRAM_RAS_N SDRAM_CAS_N SDRAM_WE_N SDRAM_DQM[*] SDRAM_ADDR[*] SDRAM_CKE SDRAM_BA SDRAM_DQ[*]}]
+        [get_ports {SDRAM_CS_N SDRAM_RAS_N SDRAM_CAS_N SDRAM_WE_N SDRAM_DQM[*] SDRAM_ADDR[*] SDRAM_CKE SDRAM_BA[*] SDRAM_DQ[*]}]
        
 
 ######################################################################       
