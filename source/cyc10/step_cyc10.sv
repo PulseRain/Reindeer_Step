@@ -139,6 +139,7 @@ module step_cyc10 (
         wire                                    dram_mem_write_en;
         wire  [`XLEN_BYTES - 1 : 0]             dram_mem_byte_enable;
         wire  [`XLEN - 1 : 0]                   dram_mem_write_data;
+        wire  unsigned [`NUM_OF_GPIOS - 1 : 0]  gpio_out;
         
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // PLL
@@ -268,7 +269,10 @@ module step_cyc10 (
             .ocd_reg_write_addr (5'd2),
             .ocd_reg_write_data (`DEFAULT_STACK_ADDR),
         
+            .RXD (RXD),
             .TXD (uart_tx_cpu),
+            
+            .GPIO_OUT(gpio_out),
     
             .start (actual_cpu_start),
             .start_address (actual_start_addr),
@@ -291,7 +295,8 @@ module step_cyc10 (
             .peek_mem_addr       ());
      
         assign processor_active = ~processor_paused;
-            
+        assign LED = gpio_out [31 : 24];
+        
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Hardware Loader
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
