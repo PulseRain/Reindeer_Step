@@ -116,7 +116,8 @@ module Reindeer_controller (
         input wire                                          exception_ecall,
         input wire                                          exception_ebreak,
         input wire                                          exception_alignment,
-        input wire                                          timer_triggered, 
+        input wire                                          timer_triggered,
+        input wire                                          ext_int_triggered,
          
         output reg                                          is_interrupt,
         output reg [`EXCEPTION_CODE_BITS - 1 : 0]           exception_code,
@@ -156,8 +157,12 @@ module Reindeer_controller (
             reg                                             ctl_store_active;
             reg                                             ctl_fetch_exe_active;
             reg                                             ctl_paused;
-            reg                                             ctl_set_interrupt_active;
-            reg                                             ctl_set_interrupt_active_reg;
+            
+            reg                                             ctl_set_timer_interrupt_active;
+            reg                                             ctl_set_timer_interrupt_active_reg;
+            reg                                             ctl_set_ext_interrupt_active;
+            reg                                             ctl_set_ext_interrupt_active_reg;
+            
             reg                                             ctl_back_to_exe;
             reg                                             ctl_back_to_exe_d1;
             reg                                             ctl_back_to_exe_d2;            
@@ -180,8 +185,9 @@ module Reindeer_controller (
             reg                                             exception_ebreak_reg;
             reg                                             exception_instruction_addr_misalign_reg;
             reg                                             exception_alignment_reg;
-            reg                                             interrupt_active;
-            
+            reg                                             timer_interrupt_active;
+            reg                                             ext_interrupt_active;
+                        
             reg                                             decode_ctl_WFI_d1;
             reg                                             ecall_active;
             
@@ -227,11 +233,13 @@ module Reindeer_controller (
                         store_active_reg <= 0;
                         
                         exception_alignment_reg <= 0;
-                        interrupt_active <= 0;
+                        timer_interrupt_active <= 0;
+                        ext_interrupt_active   <= 0;
                         
                         mem_read_addr_d1  <= 0;
             
-                        ctl_set_interrupt_active_reg <= 0;
+                        ctl_set_timer_interrupt_active_reg <= 0;
+                        ctl_set_ext_interrupt_active_reg <= 0;
                         
                         decode_ctl_WFI_d1 <= 0;
                         is_interrupt <= 0;
@@ -332,14 +340,21 @@ module Reindeer_controller (
                         end 
                         
                                 
-                        if (ctl_set_interrupt_active) begin
-                            interrupt_active <= 1'b1;
+                        if (ctl_set_timer_interrupt_active) begin
+                            timer_interrupt_active <= 1'b1;
                         end else if (!timer_triggered) begin
-                            interrupt_active <= 0;
+                            timer_interrupt_active <= 0;
                         end
                         
-                        ctl_set_interrupt_active_reg <= ctl_set_interrupt_active;
-                        
+                        if (ctl_set_ext_interrupt_active) begin
+                            ext_interrupt_active <= 1'b1;
+                        end else if (!ext_int_triggered) begin
+                            ext_interrupt_active <= 0;
+                        end
+                                                
+                        ctl_set_timer_interrupt_active_reg <= ctl_set_timer_interrupt_active;
+                        ctl_set_ext_interrupt_active_reg <= ctl_set_ext_interrupt_active;
+                                                
                         if (ctl_clear_exception) begin
                             exception_storage_page_fault_reg <= 0;
                         end else if (exception_storage_page_fault) begin
@@ -388,8 +403,11 @@ module Reindeer_controller (
                             ecall_active <= 1'b0;
                         end
                         
-                        if (ctl_set_interrupt_active_reg) begin
+                        if (ctl_set_timer_interrupt_active_reg) begin
                             exception_code <= `INTERRUPT_MACHINE_TIMER;
+                            is_interrupt <= 1'b1;
+                        end else if (ctl_set_ext_interrupt_active_reg) begin
+                            exception_code <= `INTERRUPT_MACHINE_EXTERNAL;
                             is_interrupt <= 1'b1;
                         end else begin
                             is_interrupt <= 0;
@@ -538,7 +556,7 @@ module Reindeer_controller (
                 
                 ctl_paused = 0;
                 
-                ctl_set_interrupt_active = 0;
+                ctl_set_timer_interrupt_active = 0;
                 
                 ctl_back_to_exe = 0;
                 
@@ -586,8 +604,11 @@ module Reindeer_controller (
                         ctl_fetch_init_jalr = jalr_active & (~(jalr_addr[1]));
                         ctl_fetch_init_mret_active = mret_active;
                         
-                        if (timer_triggered & (~interrupt_active) & (~ecall_active)) begin
-                            ctl_set_interrupt_active = 1'b1;
+                        if (timer_triggered & (~timer_interrupt_active) & (~ext_interrupt_active) & (~ecall_active)) begin
+                            ctl_set_timer_interrupt_active = 1'b1;
+                            next_state [S_EXCEPTION] = 1'b1;
+                        end else if (ext_int_triggered & (~timer_interrupt_active) & (~ext_interrupt_active) & (~ecall_active)) begin
+                            ctl_set_ext_interrupt_active = 1'b1;
                             next_state [S_EXCEPTION] = 1'b1;
                         end else if ((jal_active & jal_addr[1]) | (jalr_active & jalr_addr[1]) | (branch_active & branch_addr[1])) begin
                             ctl_instruction_addr_misalign_exception = 1'b1;
@@ -650,8 +671,11 @@ module Reindeer_controller (
                     end
                     
                     current_state [S_WFI_WAIT] : begin
-                        if (timer_triggered & (~interrupt_active)) begin
-                            ctl_set_interrupt_active = 1'b1;
+                        if (timer_triggered & (~timer_interrupt_active) & (~ext_interrupt_active)) begin
+                            ctl_set_timer_interrupt_active = 1'b1;
+                            next_state [S_EXCEPTION] = 1'b1;
+                        end else if (ext_int_triggered & (~timer_interrupt_active) & (~ext_interrupt_active)) begin
+                            ctl_set_ext_interrupt_active = 1'b1;
                             next_state [S_EXCEPTION] = 1'b1;
                         end else begin
                             next_state [S_WFI_WAIT] = 1'b1;
