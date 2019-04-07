@@ -181,6 +181,8 @@
 `define EXCEPTION_STORE_PAGE_FAULT          (4'hF)
 
 `define INTERRUPT_MACHINE_TIMER             (4'h7)
+`define INTERRUPT_MACHINE_EXTERNAL          (4'hB)
+
 
 `include "config.vh"
 
