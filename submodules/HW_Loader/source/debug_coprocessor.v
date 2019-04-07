@@ -284,7 +284,7 @@ module debug_coprocessor (
             end else if (ctl_load_pram_addr_ext) begin
                 pram_addr_ext <= pram_addr + 4;
             end else if (ctl_inc_pram_addr_ext) begin
-                pram_addr_ext <= pram_addr_ext + 4;
+                pram_addr_ext <= pram_addr_ext + $size(pram_addr_ext)'(4);
             end
         end
         
