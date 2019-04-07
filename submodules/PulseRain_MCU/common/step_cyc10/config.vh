@@ -52,19 +52,36 @@
 //----------------------------------------------------------------------------
 //  peripheral addresses
 //----------------------------------------------------------------------------
+    
+    `define NUM_OF_INTx                        2
+    
+    //------------------------------------------------------------------------
+    //  Timer
+    //------------------------------------------------------------------------
 
-`define UART_TX_ADDR                       (3'b100)
-`define UART_BAUD_RATE                      115200
-`define UART_TX_BAUD_PERIOD                (`MCU_MAIN_CLK_RATE / `UART_BAUD_RATE)
-`define UART_TX_BAUD_PERIOD_BITS           ($clog2(`UART_TX_BAUD_PERIOD))
-`define UART_STABLE_COUNT                  (`MCU_MAIN_CLK_RATE  / `UART_BAUD_RATE / 2)
+    `define MTIME_LOW_ADDR                     (3'b000)
+    `define MTIME_HIGH_ADDR                    (3'b001)
 
-`define MTIME_LOW_ADDR                     (3'b000)
-`define MTIME_HIGH_ADDR                    (3'b001)
+    `define MTIMECMP_LOW_ADDR                  (3'b010)
+    `define MTIMECMP_HIGH_ADDR                 (3'b011)
 
-`define MTIMECMP_LOW_ADDR                  (3'b010)
-`define MTIMECMP_HIGH_ADDR                 (3'b011)
 
+    //------------------------------------------------------------------------
+    //  UART
+    //------------------------------------------------------------------------
+
+    `define UART_TX_ADDR                       (3'b100)
+    `define UART_BAUD_RATE                      115200
+    `define UART_TX_BAUD_PERIOD                (`MCU_MAIN_CLK_RATE / `UART_BAUD_RATE)
+    `define UART_TX_BAUD_PERIOD_BITS           ($clog2(`UART_TX_BAUD_PERIOD))
+    `define UART_STABLE_COUNT                  (`MCU_MAIN_CLK_RATE  / `UART_BAUD_RATE / 2)
+
+    //------------------------------------------------------------------------
+    //  GPIO
+    //------------------------------------------------------------------------	
+    `define GPIO_ADDR                          (3'b110)
+    `define NUM_OF_GPIOS                       32 
+    
 //----------------------------------------------------------------------------
 //  hardware mul/div
 //----------------------------------------------------------------------------
