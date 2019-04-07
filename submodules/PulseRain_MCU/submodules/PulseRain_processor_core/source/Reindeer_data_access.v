@@ -97,9 +97,9 @@ module Reindeer_data_access (
         output wire                                             exception_alignment,
         
         output reg                                              mm_reg_re,
-        output reg                                              mm_reg_we,
+        output reg [`XLEN_BYTES - 1 : 0]                        mm_reg_we,
         
-        output reg [`XLEN - 1 : 0]                              mm_reg_data_to_write,
+        output wire [`XLEN - 1 : 0]                             mm_reg_data_to_write,
         output reg [`MM_REG_ADDR_BITS - 1 : 0]                  mm_reg_addr_rw_out
          
 );
@@ -256,6 +256,7 @@ module Reindeer_data_access (
             end
             
             assign load_done = ctl_load_done;
+            assign mm_reg_data_to_write = mem_data_to_write;
             
             always @(posedge clk, negedge reset_n) begin
                 if (!reset_n) begin
@@ -278,7 +279,6 @@ module Reindeer_data_access (
                     
                 //    load_masked_data <= 0;
                     
-                    mm_reg_data_to_write <= 0;
                     mm_reg_addr_rw_out <= 0;
                     
                     mem_addr_rw_out_tail_reg <= 0;
@@ -292,10 +292,9 @@ module Reindeer_data_access (
                     mem_write_addr_d1 <= mem_write_addr;
                     ctl_load_exception_d1 <= ctl_load_exception;
                     
-                    mm_reg_we <= ctl_mem_we & mem_write_addr [`REG_SPACE_BIT];
+                    mm_reg_we <= {(`XLEN_BYTES){ctl_mem_we & mem_write_addr [`REG_SPACE_BIT]}} & width_mask;
                     mm_reg_re <= ctl_mem_re & mem_read_addr [`REG_SPACE_BIT];
                     
-                    mm_reg_data_to_write <= data_to_store;
                     mm_reg_addr_rw_out <= ctl_mem_we ? mem_write_addr [`MM_REG_ADDR_BITS + 1 : 2] : mem_read_addr [`MM_REG_ADDR_BITS + 1 : 2];
                     
                     //ctl_mem_we_d1 <= ctl_mem_we & mem_write_addr [`MEM_SPACE_BIT];
@@ -308,7 +307,7 @@ module Reindeer_data_access (
                     
               //      mem_we <={ctl_mem_we_d1, ctl_mem_we_d1, ctl_mem_we_d1, ctl_mem_we_d1} & width_mask;
                 
-                    mem_we <= {4{ctl_mem_we & mem_write_addr [`MEM_SPACE_BIT]}} & width_mask;
+                    mem_we <= {(`XLEN_BYTES){ctl_mem_we & mem_write_addr [`MEM_SPACE_BIT]}} & width_mask;
                     
         /*            if (mem_enable_in) begin
                         mem_data_in_reg <= mem_data_in;
