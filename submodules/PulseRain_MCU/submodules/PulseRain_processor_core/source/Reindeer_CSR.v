@@ -49,6 +49,7 @@ module Reindeer_CSR (
     //  interrupt
     //=======================================================================
         input   wire                                            timer_triggered,
+        input   wire                                            ext_int_triggered,
         
     //=======================================================================
     //  exception
@@ -64,8 +65,10 @@ module Reindeer_CSR (
         output  wire  [`XLEN - 1 : 0]                           mtvec_out,
         output  wire  [`XLEN - 1 : 0]                           mepc_out,
         output  wire                                            mtie_out,
+        output  wire                                            meie_out,
         output  wire                                            mie_out,
-        output  wire                                            mtip_out
+        output  wire                                            mtip_out,
+        output  wire                                            meip_out
         
 );
 
@@ -88,10 +91,13 @@ module Reindeer_CSR (
         reg [`XLEN - 1 : 0]                             minstreth;
         
         reg                                             mie_mtie;
+        reg                                             mie_meie;
         reg                                             mstatus_mpie;
         reg                                             mstatus_mie;
         reg                                             timer_triggered_d1;
+        reg                                             ext_int_triggered_d1;
         reg                                             mtip;
+        reg                                             meip;
         
    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    // datapath
@@ -103,9 +109,11 @@ module Reindeer_CSR (
         assign mtvec_out = mtvec;
         assign mepc_out  = mepc;
         
+        assign meie_out = mie_meie;
         assign mtie_out = mie_mtie;
         assign mie_out = mstatus_mie;
         assign mtip_out = mtip;
+        assign meip_out = meip;
         
         always @(posedge clk, negedge reset_n) begin : output_proc
             if (!reset_n) begin
@@ -131,17 +139,21 @@ module Reindeer_CSR (
                 end
                 
                 mie_mtie        <= 0;
+                mie_meie        <= 0;
         
                 mstatus_mpie    <= 0;
                 mstatus_mie     <= 0;
                 
-                timer_triggered_d1 <= 0;
+                timer_triggered_d1   <= 0;
+                ext_int_triggered_d1 <= 0;
                 
                 mtip <= 0;
+                meip <= 0;
         
             end else begin
             
-                timer_triggered_d1 <= timer_triggered;
+                timer_triggered_d1   <= timer_triggered;
+                ext_int_triggered_d1 <= ext_int_triggered;
                 
                 read_en_out_i   <= read_enable;
                 
@@ -159,6 +171,12 @@ module Reindeer_CSR (
                     mtip <= 1'b1;
                 end else if (!timer_triggered) begin
                     mtip <= 0;
+                end
+                
+                if ((~ext_int_triggered_d1) & ext_int_triggered) begin
+                    meip <= 1'b1;
+                end else if (!ext_int_triggered) begin
+                    meip <= 0;
                 end
                 
                 if (activate_exception) begin
@@ -250,11 +268,11 @@ module Reindeer_CSR (
                         end
                         
                         `CSR_MIP : begin
-                            read_data_out_i <= {20'd0, 4'd0, mtip, 3'd0, 4'd0};
+                            read_data_out_i <= {20'd0, meip, 3'd0, mtip, 3'd0, 4'd0};
                         end
                         
                         `CSR_MIE :begin
-                            read_data_out_i <= {24'd0, mie_mtie, 7'd0};
+                            read_data_out_i <= {20'd0, mie_meie, 3'b000, mie_mtie, 7'd0};
                         end
                         
                         default :  begin
@@ -296,11 +314,13 @@ module Reindeer_CSR (
                         end
                      
                         `CSR_MIE       : begin
-                            mie_mtie     <= write_data_in[7];
+                            mie_mtie    <= write_data_in[7];
+                            mie_meie    <= write_data_in[11];
                         end
                         
                         `CSR_MIP       : begin
-                            mtip  <= write_data_in[7];
+                            mtip        <= write_data_in[7];
+                            meip        <= write_data_in[11];
                         end
                         
                         default :  begin
