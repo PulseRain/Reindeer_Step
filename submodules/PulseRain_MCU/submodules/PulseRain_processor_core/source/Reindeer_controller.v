@@ -557,6 +557,7 @@ module Reindeer_controller (
                 ctl_paused = 0;
                 
                 ctl_set_timer_interrupt_active = 0;
+                ctl_set_ext_interrupt_active = 0;
                 
                 ctl_back_to_exe = 0;
                 
