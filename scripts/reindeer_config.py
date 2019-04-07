@@ -601,7 +601,7 @@ if __name__ == "__main__":
     
     print ("===============================================================================")
     print ("# Copyright (c) 2019, PulseRain Technology LLC ")
-    print ("# Reindeer Configuration Utility, Version 2.1")
+    print ("# Reindeer Configuration Utility, Version 2.2")
     
     
     #=========================================================================
@@ -783,6 +783,10 @@ if __name__ == "__main__":
         print (" ")
         ocd.start_to_run (start_addr)
     
+        if (console_enable):
+            ocd._serial.close()
+            ocd._serial = serial.Serial(com_port, 115200)
+        
         while(console_enable):
             if (ocd._serial.in_waiting):
                 r = ocd._serial.read (ocd._serial.in_waiting)  
