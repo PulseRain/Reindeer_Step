@@ -126,6 +126,7 @@
 `define CSR_MIDELEG     (12'h303)    // Machine interrupt delegation register
 `define CSR_MIE         (12'h304)    // Machine interrupt-enable register
 `define CSR_MTVEC       (12'h305)    // Machine trap-handler base address
+`define CSR_MTVT        (12'h307)    // Machine trap-handler vector table base address
 `define CSR_MCYCLE      (12'hB00)    // Machine mcycle
 `define CSR_MCYCLEH     (12'hB80)    // Machine mcycleh
 `define CSR_MINSTRET    (12'hB02)    // Machine Instructions-retired counter
