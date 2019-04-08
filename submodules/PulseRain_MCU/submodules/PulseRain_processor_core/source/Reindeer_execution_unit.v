@@ -542,67 +542,48 @@ module Reindeer_execution_unit (
                     end
                 end
                 
-                
                 always @(posedge clk) begin : mul_div_reg_proc
-                    case (funct3_mul_div) // synopsys parallel_case     
+                    case (funct3_mul_div) // synopsys full_case parallel_case     
                         `RV32M_MUL : begin
-                            //mul_div_out_reg <=  ?  Z_neg [31 : 0]: Z [31 : 0];
-                            mul_div_out_reg <=  Z [31 : 0];
+                            mul_div_out_reg <=  mul_div_sign_reg  ?  Z_neg [31 : 0]: Z [31 : 0];
                         end
                         
-                    /*    `RV32M_MULH : begin
-                            //mul_div_out_reg <= mul_div_sign_reg ? Z_neg [63 : 32] : Z [63 : 32];                    
-                            mul_div_out_reg <= Z [63 : 32];
+                        `RV32M_MULH : begin
+                            mul_div_out_reg <= mul_div_sign_reg ? Z_neg [63 : 32] : Z [63 : 32];                    
                         end
                         
                         `RV32M_MULHSU : begin
-                            //mul_div_out_reg <= x_sign_reg ? Z_neg [63 : 32] : Z [63 : 32];
-                            mul_div_out_reg <= Z [63 : 32];
+                            mul_div_out_reg <= x_sign_reg ? Z_neg [63 : 32] : Z [63 : 32];
                         end
                         
                         `RV32M_MULHU : begin
                             mul_div_out_reg <= Z [63 : 32];
                         end
-                      */
-
-                        `RV32M_MULH, `RV32M_MULHSU, `RV32M_MULHU : begin
-                            mul_div_out_reg <= Z [63 : 32];
-                        end
                       
-                  //      `RV32M_DIV : begin
-                  //          if (overflow_flag) begin
-                  //              mul_div_out_reg <= 32'hFFFFFFFF;
-                  //          end else begin
-                  //              mul_div_out_reg <= mul_div_sign_reg ? Q_neg : Q;
-                  //          end
-                  //      end
+                        `RV32M_DIV : begin
+                            if (overflow_flag) begin
+                                mul_div_out_reg <= 32'hFFFFFFFF;
+                            end else begin
+                                mul_div_out_reg <= mul_div_sign_reg ? Q_neg : Q;
+                            end
+                        end
                         
                         `RV32M_DIVU : begin
                             mul_div_out_reg <= Q;
                         end
                         
-                        /*
+                        
                         `RV32M_REM : begin
-                           // mul_div_out_reg <= x_sign_reg ? R_neg : R;
-                           mul_div_out_reg <= R;
+                            mul_div_out_reg <= x_sign_reg ? R_neg : R;
+                           
                         end
                         
                         `RV32M_REMU : begin
                             mul_div_out_reg <= R;
                         end
-                        */
-                        
-                        `RV32M_REM, `RV32M_REMU : begin
-                            mul_div_out_reg <= R;
-                        end
                         
                         default : begin
-                            if (overflow_flag) begin
-                                mul_div_out_reg <= 32'hFFFFFFFF;
-                            end else begin
-                               // mul_div_out_reg <= mul_div_sign_reg ? Q_neg : Q;
-                                mul_div_out_reg <= Q;
-                            end
+                          
                         end
                     endcase
                 end
