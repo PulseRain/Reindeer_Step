@@ -321,7 +321,7 @@ module PulseRain_Reindeer_core (
         
         
             assign ocd_mem_enable_out = mem_enable_out;
-            assign ocd_mem_word_out   = mem_word_out;
+            assign ocd_mem_word_out   = mem_read_data;
         
         //---------------------------------------------------------------------
         // register file
