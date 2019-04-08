@@ -85,8 +85,8 @@ module Reindeer_mm_reg (
    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    // Input
    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        assign load_mtimecmp_low  = (data_write_enable && (data_rw_addr == `MTIMECMP_LOW_ADDR)) ? 1'b1 : 1'b0;
-        assign load_mtimecmp_high = (data_write_enable && (data_rw_addr == `MTIMECMP_HIGH_ADDR)) ? 1'b1 : 1'b0;
+        assign load_mtimecmp_low  = ((data_write_enable != 0) && (data_rw_addr == `MTIMECMP_LOW_ADDR)) ? 1'b1 : 1'b0;
+        assign load_mtimecmp_high = ((data_write_enable != 0) && (data_rw_addr == `MTIMECMP_HIGH_ADDR)) ? 1'b1 : 1'b0;
         
    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
    // Output
