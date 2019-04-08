@@ -361,7 +361,6 @@ int uut_memory_peek (testbench *tb, UUT *uut, unsigned long lma, unsigned long l
         while(1) {
          
             if (uut->ocd_mem_enable_out) {
-                tb->run();
                 data = uut->ocd_mem_word_out;
                 break;
             }
