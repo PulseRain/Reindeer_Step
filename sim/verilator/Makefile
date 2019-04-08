@@ -61,6 +61,14 @@ target = ./obj_dir/VPulseRain_Reindeer_MCU
 all_test_cases =  \
 I-MISALIGN_LDST-01 \
 I-MISALIGN_JMP-01 \
+MUL \
+MULH \
+MULHSU \
+MULHU \
+DIV \
+DIVU \
+REM \
+REMU \
 I-ADD-01 \
 I-ADDI-01 \
 I-AND-01 \
