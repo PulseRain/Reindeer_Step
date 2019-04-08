@@ -62,14 +62,12 @@ module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $
         reg                                                      baud_rate_pulse;
         reg [BAUD_PERIOD_BITS - 1 : 0]                           counter;
         reg                                                      ctl_reset_stable_counter;
-        reg                                                      ctl_save_counter;
         reg [$clog2 (8 + 4) - 1 : 0]                             data_counter;
         reg                                                      ctl_reset_data_counter;
         reg                                                      ctl_inc_data_counter;
         reg [8 + 2 : 0]                                          tx_data;                            
         reg                                                      ctl_load_tx_data;
         reg                                                      ctl_shift_tx_data;
-        reg                                                      ctl_set_TI;
         reg                                                      ctl_counter_reset;
         reg                                                      tx_start_flag;
         reg                                                      ctl_set_tx_start_flag;
@@ -89,7 +87,7 @@ module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $
             end else if (baud_rate_counter == baud_rate_period_m1) begin
                 baud_rate_counter <= 0;
             end else begin
-                baud_rate_counter <= baud_rate_counter + 1;
+                baud_rate_counter <= baud_rate_counter + ($size(baud_rate_counter))'(1);
             end
         end 
                 
@@ -130,7 +128,7 @@ module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $
             end else if (baud_rate_pulse) begin
                 counter <= 0;
             end else begin
-                counter <= counter + 1;
+                counter <= counter + ($size(counter))'(1);
             end
         end 
             
@@ -143,7 +141,7 @@ module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $
             end else if (ctl_reset_data_counter) begin
                 data_counter <= 0;
             end else if (ctl_inc_data_counter) begin
-                data_counter <= data_counter + 1;
+                data_counter <= data_counter + ($size(data_counter))'(1);
             end
         end 
         
@@ -157,7 +155,7 @@ module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $
             end else if (ctl_reset_stable_counter) begin
                 stable_counter <= 0;
             end else begin
-                stable_counter <= stable_counter + 1;
+                stable_counter <= stable_counter + ($size(stable_counter))'(1);
             end         
         end 
     
@@ -202,7 +200,6 @@ module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $
             next_state = 0;
             
             ctl_reset_stable_counter = 0;
-            ctl_save_counter = 0;
             ctl_reset_data_counter = 0;
             
             ctl_inc_data_counter = 0;
@@ -211,7 +208,6 @@ module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $
             
             ctl_shift_tx_data = 0;
                         
-            ctl_set_TI = 0;
             ctl_counter_reset = 0;
             
             ctl_set_tx_start_flag = 0;
@@ -254,7 +250,6 @@ module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $
                 
                 current_state [S_TX_DATA] : begin
                     if (data_counter == (8 + 3)) begin
-                        ctl_set_TI = 1'b1;
                         next_state [S_IDLE] = 1;
                     end else if (baud_rate_pulse) begin
                         ctl_shift_tx_data = 1'b1;
@@ -278,7 +273,6 @@ module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $
                 current_state [S_TX_WAIT2] : begin
                     
                     if (baud_rate_pulse) begin
-                        ctl_set_TI = 1'b1;
                         next_state [S_IDLE] = 1;
                     end else begin
                         ctl_load_tx_data = 1'b1;                        

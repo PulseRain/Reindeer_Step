@@ -75,7 +75,7 @@ module debug_reply (
             end else if (ctl_reset_data_counter) begin
                 data_counter <= 0;
             end else if (ctl_inc_data_counter) begin
-                data_counter <= data_counter + 1;
+                data_counter <= data_counter + ($size(data_counter))'(1);
             end
         end
             

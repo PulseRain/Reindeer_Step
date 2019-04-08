@@ -87,7 +87,7 @@ module sdram_controller (
                 end else if (ctl_start_mem_rw) begin
                     byteenable_n            <= {2'b00, byteenable_n[$high(byteenable_n) : 2]};
                     write_data              <= {(SDRAM_BUS_BITS)'(0), write_data[$high(write_data) : SDRAM_BUS_BITS]}; 
-                    sdram_av_address        <= sdram_av_address + 1;
+                    sdram_av_address        <= sdram_av_address + ($size(sdram_av_address))'(1);
                 end
                 
             end

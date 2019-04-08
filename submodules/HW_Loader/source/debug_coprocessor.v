@@ -154,7 +154,7 @@ module debug_coprocessor (
             end else if (ctl_reset_input_counter) begin
                 input_counter <= 0;
             end else if (enable_in_sr[0]) begin
-                input_counter <= input_counter + 1;
+                input_counter <= input_counter + ($size(input_counter))'(1);
             end
         end
         
@@ -248,22 +248,22 @@ module debug_coprocessor (
                 
                 case (1'b1) // synthesis parallel_case 
                     ctl_reply_wr_ack : begin
-                        reply_debug_cmd <= (1 << (`OP_DBG_ACK)); 
+                        reply_debug_cmd <= ($size(reply_debug_cmd))'(1 << (`OP_DBG_ACK)); 
                         reply_payload <= {frame_type, toggle_bit, pram_addr, 32'hAAABACAD};
                     end
                     
                     ctl_reply_pram_read_back : begin
-                        reply_debug_cmd <= (1 << (`OP_READ_BACK_4_BYTES));   
+                        reply_debug_cmd <= ($size(reply_debug_cmd))'(1 << (`OP_READ_BACK_4_BYTES));   
                         reply_payload <= {frame_type, toggle_bit, pram_addr, pram_read_data_in};
                     end
                     
                     ctl_cpu_status_ack : begin
-                        reply_debug_cmd <= (1 << `OP_CPU_STATUS_ACK);
+                        reply_debug_cmd <= ($size(reply_debug_cmd))'(1 << `OP_CPU_STATUS_ACK);
                         reply_payload <= {frame_type, toggle_bit, 8'h0, 7'd59, 1'b0, 16'hBEEF, 16'hDEAD};
                     end
                     
                     ctl_reply_data_mem_read_back : begin
-                        reply_debug_cmd <= (1 << (`OP_DATA_MEM_READ));
+                        reply_debug_cmd <= ($size(reply_debug_cmd))'(1 << (`OP_DATA_MEM_READ));
                         reply_payload <= {frame_type, toggle_bit, 16'h999D, 24'hAABBCC, 8'hDC};
                     end
                     
@@ -282,7 +282,7 @@ module debug_coprocessor (
             if (!reset_n) begin
                 pram_addr_ext <= 0;
             end else if (ctl_load_pram_addr_ext) begin
-                pram_addr_ext <= pram_addr + 4;
+                pram_addr_ext <= pram_addr + ($size(pram_addr))'(4);
             end else if (ctl_inc_pram_addr_ext) begin
                 pram_addr_ext <= pram_addr_ext + $size(pram_addr_ext)'(4);
             end

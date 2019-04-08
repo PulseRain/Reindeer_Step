@@ -63,7 +63,6 @@ module Reindeer_instruction_decode (
         output reg                                              ctl_load_X_from_rs1,
         output reg                                              ctl_load_Y_from_rs2,
         output reg                                              ctl_load_Y_from_imm_12,
-        output reg                                              ctl_load_Y_from_store_offset_12,
         output reg                                              ctl_save_to_rd,
         output reg                                              ctl_ALU_FUNCT3,
         output reg                                              ctl_MUL_DIV_FUNCT3,
@@ -88,7 +87,6 @@ module Reindeer_instruction_decode (
         wire    [`REG_ADDR_BITS - 1 : 0]                        rs1_32;
         wire    [`REG_ADDR_BITS - 1 : 0]                        rs2_32;
         
-        wire    [`REG_ADDR_BITS - 1 : 0]                        rd;
         wire    [2 : 0]                                         funct3;
         wire    [11 : 0]                                        funct12;
         
@@ -103,8 +101,6 @@ module Reindeer_instruction_decode (
             assign rs1_32 = IR_in [19 : 15];
             assign rs2_32 = IR_in [24 : 20];
 
-            assign rd = IR_in [11 : 7];
-            
             assign rs1 = rs1_32;
             assign rs2 = rs2_32;
 
@@ -121,10 +117,6 @@ module Reindeer_instruction_decode (
 
             always @(*) begin : csr_read_enable_proc
                 csr_read_enable = ctl_SYSTEM & ctl_CSR;
-                
-             //==   if (csr_read_enable && (funct3 == `SYSTEM_CSRRW) && (rd == 0)) begin
-              //==      csr_read_enable = 1'b0;
-              //==  end
             
             end
             

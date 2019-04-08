@@ -65,7 +65,7 @@ module debug_UART #(parameter BAUD_PERIOD = 868) (
                 if (baud_counter == (BAUD_PERIOD - 1)) begin
                     baud_counter <= 0;
                 end else begin
-                    baud_counter <= baud_counter + 1;
+                    baud_counter <= baud_counter + ($size(baud_counter))'(1);
                 end
             end
         end 

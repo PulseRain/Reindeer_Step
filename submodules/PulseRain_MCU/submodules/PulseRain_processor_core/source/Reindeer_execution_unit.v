@@ -237,8 +237,12 @@ module Reindeer_execution_unit (
                     exe_enable_d1 <= 0;
                     
                     mul_div_done <= 0;
+						  
+						  enable_out <= 0;
                     
                 end else begin
+					 
+						  enable_out <= enable_in;
                     
                     X <= rs1_in;
                     Y <= ctl_load_Y_from_imm_12 ? {{20{I_immediate_12[11]}}, I_immediate_12} : rs2_in;
@@ -286,7 +290,7 @@ module Reindeer_execution_unit (
         //  ALU
         //---------------------------------------------------------------------
             always @(*) begin : alu_proc
-                case (funct3) // synopsys full_case parallel_case     
+                case (funct3) // synopsys parallel_case     
                     `ALU_ADD_SUB : begin
                         ALU_out = (ADD0_SUB1) ? (X - Y) : (X + Y);
                     end
@@ -344,7 +348,7 @@ module Reindeer_execution_unit (
         //---------------------------------------------------------------------
                         
             always @(*) begin : branch_proc
-                case (funct3) // synopsys full_case parallel_case     
+                case (funct3) // synopsys parallel_case     
                     `BRANCH_BEQ : begin
                         branch_active_i = (X == Y) ? 1'b1 : 1'b0;
                     end
@@ -427,7 +431,7 @@ module Reindeer_execution_unit (
         //---------------------------------------------------------------------
             
             always @(*) begin
-                case (funct3) // synopsys full_case parallel_case     
+                case (funct3) // synopsys parallel_case     
                     `SYSTEM_CSRRW : begin
                         csr_new_value = X;
                     end
@@ -540,7 +544,7 @@ module Reindeer_execution_unit (
                 
                 
                 always @(posedge clk) begin : mul_div_reg_proc
-                    case (funct3_mul_div) // synopsys full_case parallel_case     
+                    case (funct3_mul_div) // synopsys parallel_case     
                         `RV32M_MUL : begin
                             //mul_div_out_reg <=  ?  Z_neg [31 : 0]: Z [31 : 0];
                             mul_div_out_reg <=  Z [31 : 0];
@@ -656,9 +660,9 @@ module Reindeer_execution_unit (
             assign mem_write_addr =  X + {{20{IR_out [31]}}, IR_out [31 : 25], IR_out [11 : 7]};
             assign mem_read_addr  =  X + {{20{IR_out[31]}}, IR_out[31 : 20]};
             
-            assign unaligned_read  = (width == `WIDTH_32) ? (mem_read_addr[0] | mem_read_addr[1]) : ( (width == `WIDTH_16) || (width == `WIDTH_16U) ?  mem_read_addr[0] : 0 );
+            assign unaligned_read  = (width == `WIDTH_32) ? (mem_read_addr[0] | mem_read_addr[1]) : ( (width == `WIDTH_16) || (width == `WIDTH_16U) ?  mem_read_addr[0] : 1'b0 );
             
-            assign unaligned_write = (width == `WIDTH_32) ? (mem_write_addr[0] | mem_write_addr[1]) : ( (width == `WIDTH_16) || (width == `WIDTH_16U) ?  mem_write_addr[0] : 0 );
+            assign unaligned_write = (width == `WIDTH_32) ? (mem_write_addr[0] | mem_write_addr[1]) : ( (width == `WIDTH_16) || (width == `WIDTH_16U) ?  mem_write_addr[0] : 1'b0 );
             assign width_load_store = width;
         
 endmodule

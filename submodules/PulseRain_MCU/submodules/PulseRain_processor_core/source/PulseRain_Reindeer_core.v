@@ -142,7 +142,6 @@ module PulseRain_Reindeer_core (
         wire                                            decode_ctl_load_X_from_rs1;
         wire                                            decode_ctl_load_Y_from_rs2;
         wire                                            decode_ctl_load_Y_from_imm_12;
-        wire                                            decode_ctl_load_Y_from_store_offset_12;
         wire                                            decode_ctl_save_to_rd;
         wire                                            decode_ctl_ALU_FUNCT3;
         wire                                            decode_ctl_MUL_DIV_FUNCT3;
@@ -387,6 +386,7 @@ module PulseRain_Reindeer_core (
                 .mtvec_out (mtvec_value),
                 .mepc_out  (mepc_value),
                 .mtie_out  (mtie_out),
+                .meie_out  (meie_out),
                 .mie_out   (mie_out),
                 .mtip_out  (mtip_out),
                 .meip_out  (meip_out));
@@ -443,7 +443,6 @@ module PulseRain_Reindeer_core (
                 .ctl_load_X_from_rs1             (decode_ctl_load_X_from_rs1),
                 .ctl_load_Y_from_rs2             (decode_ctl_load_Y_from_rs2),
                 .ctl_load_Y_from_imm_12          (decode_ctl_load_Y_from_imm_12),
-                .ctl_load_Y_from_store_offset_12 (decode_ctl_load_Y_from_store_offset_12),
                 .ctl_save_to_rd                  (decode_ctl_save_to_rd),
                 .ctl_ALU_FUNCT3                  (decode_ctl_ALU_FUNCT3),
                 .ctl_MUL_DIV_FUNCT3              (decode_ctl_MUL_DIV_FUNCT3),

@@ -79,7 +79,7 @@ module long_slow_div_denom_reg
             iteration <= 0;
             remainder <= 0;
         end else if (ctl_division_enable) begin
-            iteration <= iteration + 1;
+            iteration <= iteration + ($size(iteration))'(1);
             
             remainder <= L_num_high[32 : 1];
             

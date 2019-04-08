@@ -70,8 +70,6 @@ module Reindeer_fetch_instruction (
             reg                                             ctl_load_start_addr;
             reg                                             ctl_inc_read_addr;
             reg                                             ctl_read_mem_enable;
-            reg                                             read_mem_enable_d1;
-            reg                                             ctl_state_idle;
 
             reg [`PC_BITWIDTH - 1 : 0]                      start_addr_reg;
             reg                                             read_active;
@@ -90,14 +88,12 @@ module Reindeer_fetch_instruction (
                     if (!reset_n) begin
                         read_mem_enable    <= 0;
                         read_mem_addr      <= 0;
-                        read_mem_enable_d1 <= 0;
                         read_active <= 0;
                         
                         start_addr_reg <= 0;
                         
                     end else begin
                         read_mem_enable    <= ctl_read_mem_enable;
-                        read_mem_enable_d1 <= read_mem_enable;
                         
                         if (ctl_save_start_addr) begin
                             start_addr_reg <= start_addr;
@@ -138,7 +134,6 @@ module Reindeer_fetch_instruction (
                             PC_out <= {start_addr_reg [`PC_BITWIDTH - 1 : `MEM_ADDR_BITS + 2], mem_addr_ack, 2'b00};
                         end
                         
-                        //if (mem_read_done & read_mem_enable_d1) begin
                         if (mem_read_done & read_active) begin
                             IR_out <= mem_data;
                         end
@@ -170,8 +165,7 @@ module Reindeer_fetch_instruction (
                 ctl_load_start_addr = 0;
                 ctl_read_mem_enable = 0;
                 ctl_inc_read_addr   = 0;
-                ctl_state_idle      = 0;
-                ctl_save_start_addr = 0;
+                 ctl_save_start_addr = 0;
                 
                 ctl_mem_ack_suppress = 0;
                 
@@ -179,7 +173,6 @@ module Reindeer_fetch_instruction (
                     
                     current_state[S_IDLE]: begin
                         
-                        ctl_state_idle = 1'b1;
                         
                         if (fetch_init) begin
                             ctl_load_start_addr = 1'b1;

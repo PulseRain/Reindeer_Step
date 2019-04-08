@@ -187,7 +187,7 @@ module Serial_RS232 #(parameter STABLE_TIME = 434, MAX_BAUD_PERIOD = 868) (
             end else if (baud_rate_pulse) begin
                 counter <= 0;
             end else begin
-                counter <= counter + 1;
+                counter <= counter + ($size(counter))'(1);
             end
         end 
         
@@ -210,7 +210,7 @@ module Serial_RS232 #(parameter STABLE_TIME = 434, MAX_BAUD_PERIOD = 868) (
             end else if (ctl_reset_data_counter) begin
                 data_counter <= 0;
             end else if (ctl_inc_data_counter) begin
-                data_counter <= data_counter + 1;
+                data_counter <= data_counter + ($size(data_counter))'(1);
             end
         end 
         
@@ -224,7 +224,7 @@ module Serial_RS232 #(parameter STABLE_TIME = 434, MAX_BAUD_PERIOD = 868) (
             end else if (ctl_reset_stable_counter) begin
                 stable_counter <= 0;
             end else begin
-                stable_counter <= stable_counter + 1;
+                stable_counter <= stable_counter + ($size(stable_counter))'(1);
             end         
         end 
     

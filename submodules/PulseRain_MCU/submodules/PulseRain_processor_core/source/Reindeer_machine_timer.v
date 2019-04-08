@@ -66,7 +66,7 @@ module Reindeer_machine_timer (
                 mtime_cycle_pulse <= 0;
    
             end else if (mtime_cycle_counter != (`MTIME_CYCLE_PERIOD - 1)) begin 
-                mtime_cycle_counter <= mtime_cycle_counter + 1;
+                mtime_cycle_counter <= mtime_cycle_counter + ($size(mtime_cycle_counter))'(1);
                 mtime_cycle_pulse <= 0;
             end else begin
                 mtime_cycle_counter <= 0;

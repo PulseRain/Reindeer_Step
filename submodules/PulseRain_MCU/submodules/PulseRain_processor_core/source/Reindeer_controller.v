@@ -154,7 +154,6 @@ module Reindeer_controller (
             reg                                             ctl_activate_exception;
             reg                                             ctl_instruction_addr_misalign_exception;
             reg                                             ctl_load_active;
-            reg                                             ctl_store_active;
             reg                                             ctl_fetch_exe_active;
             reg                                             ctl_paused;
             
@@ -170,8 +169,8 @@ module Reindeer_controller (
             reg                                             fetch_active;
             
             reg                                             load_active_reg;
-            reg                                             store_active_reg;
-            
+           
+           
            
             reg                                             first_exe;
 
@@ -194,14 +193,11 @@ module Reindeer_controller (
             reg                                             decode_enable_out_d1;
             
             reg [`PC_BITWIDTH - 1 : 0]                      PC_load_store;
-            reg [`PC_BITWIDTH - 1 : 0]                      PC_data_access;
             reg [`PC_BITWIDTH - 1 : 0]                      PC_save; 
         
             reg                                             load_active_d1;
             reg                                             store_active_d1;
-            reg                                             exception_alignment_d1;
-      
-    
+                
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // data path
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -229,7 +225,6 @@ module Reindeer_controller (
                         exception_addr <= 0;
                         
                         load_active_reg  <= 0;
-                        store_active_reg <= 0;
                         
                         exception_alignment_reg <= 0;
                         timer_interrupt_active <= 0;
@@ -251,18 +246,13 @@ module Reindeer_controller (
                         
                         fetch_active <= 0;
                         
-                        PC_data_access <= 0;
                         PC_load_store <= 0;
                         
                         load_active_d1 <= 0;
                         store_active_d1 <= 0;
                         
-                        exception_alignment_d1 <= 0;
-                        
                     end else begin
-                         
-                        exception_alignment_d1 <= exception_alignment;
-                        
+                                    
                         load_active_d1 <= load_active;
                         store_active_d1 <= store_active;
                         
@@ -279,11 +269,6 @@ module Reindeer_controller (
                         
                         if (((~load_active_d1) & load_active) | ((~store_active_d1) & store_active)) begin
                             PC_load_store <= PC_in;
-                        end
-                        
-                        
-                        if (ctl_data_access_enable) begin
-                            PC_data_access <= PC_in;
                         end
                         
                         if (ctl_fetch_enable) begin
@@ -384,12 +369,6 @@ module Reindeer_controller (
                             load_active_reg <= 0;
                         end else if (ctl_load_active) begin
                             load_active_reg <= 1'b1;
-                        end
-                        
-                        if (ctl_fetch_exe_active) begin
-                            store_active_reg <= 0;
-                        end else if (ctl_store_active) begin
-                            store_active_reg <= 1'b1;
                         end
                         
                         if (exception_ecall) begin
@@ -546,7 +525,7 @@ module Reindeer_controller (
                 ctl_instruction_addr_misalign_exception = 0;
                 
                 ctl_load_active = 0;
-                ctl_store_active = 0;
+            
                 ctl_fetch_exe_active = 0;
                 
                 ctl_paused = 0;
@@ -676,7 +655,6 @@ module Reindeer_controller (
                     current_state [S_STORE] : begin
                         if ((!fetch_active) && (dram_rw_pending == 0)) begin
                             ctl_data_access_enable = 1'b1;
-                            ctl_store_active = 1'b1;
                             next_state [S_STORE_WAIT] = 1'b1;
                         end else begin
                             next_state [S_STORE] = 1'b1;

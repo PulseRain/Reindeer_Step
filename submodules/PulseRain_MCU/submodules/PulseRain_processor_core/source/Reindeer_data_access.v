@@ -118,8 +118,6 @@ module Reindeer_data_access (
         
         reg                                                     ctl_store_done;
         reg                                                     ctl_load_done;
-        reg                                                     ctl_load_shift;
-        reg                                                     ctl_load_mask;
         reg                                                     ctl_load_reg_write;
         
         reg [2 : 0]                                             width_reg;
@@ -297,133 +295,38 @@ module Reindeer_data_access (
                     
                     mm_reg_addr_rw_out <= ctl_mem_we ? mem_write_addr [`MM_REG_ADDR_BITS + 1 : 2] : mem_read_addr [`MM_REG_ADDR_BITS + 1 : 2];
                     
-                    //ctl_mem_we_d1 <= ctl_mem_we & mem_write_addr [`MEM_SPACE_BIT];
                     ctl_mem_we_d1 <= ctl_mem_we;
                     
                     store_done <= ctl_store_done;
-                    //load_done  <= ctl_load_done;
                     
-                    
-                    
-              //      mem_we <={ctl_mem_we_d1, ctl_mem_we_d1, ctl_mem_we_d1, ctl_mem_we_d1} & width_mask;
-                
                     mem_we <= {(`XLEN_BYTES){ctl_mem_we & mem_write_addr [`MEM_SPACE_BIT]}} & width_mask;
                     
-        /*            if (mem_enable_in) begin
-                        mem_data_in_reg <= mem_data_in;
-                    end else if (mm_reg_enable_in) begin
-                        mem_data_in_reg <= mm_reg_data_in;
-                    end else if (ctl_load_shift) begin
-                        case (mem_addr_rw_out [1 : 0]) // synthesis parallel_case 
-                            2'b01 : begin
-                                mem_data_in_reg <= mem_data_in_reg >> 8;
-                            end
-                            
-                            2'b10 : begin
-                                mem_data_in_reg <= mem_data_in_reg >> 16;
-                            end
-                            
-                            2'b11 : begin
-                                mem_data_in_reg <= mem_data_in_reg >> 24;
-                            end
-                            
-                            default : begin
-                            
-                            end
-                            
-                        endcase
-                        
-                    end
-          */         
-/*                   
-                    if (ctl_mem_we) begin
-                         case (mem_write_addr[1 : 0]) // synthesis parallel_case 
-                            2'b01 : begin
-                                mem_data_to_write <= {data_to_store[23 : 0], 8'd0};
-                            end
+                 
+                    case (mem_write_addr[1 : 0]) // synthesis parallel_case 
+                        2'b01 : begin
+                              mem_data_to_write <= {data_to_store[23 : 0], 8'd0};
+                        end
 
-                            2'b10 : begin
-                                mem_data_to_write <= {data_to_store[15 : 0], 16'd0};
-                            end
-                            
-                            2'b11 : begin
-                                mem_data_to_write <= {data_to_store[7 : 0], 24'd0};
-                            end
-                            
-                            default : begin
-                                mem_data_to_write <= data_to_store;
-                            end
-                            
-                        endcase
-                        
-                        mem_addr_rw_out <= mem_write_addr;
-                    end else if (ctl_mem_re) begin
-                        mem_addr_rw_out <= mem_read_addr;
-                    end 
-*/
-                case (mem_write_addr[1 : 0]) // synthesis parallel_case 
-                    2'b01 : begin
-                        mem_data_to_write <= {data_to_store[23 : 0], 8'd0};
-                    end
+                        2'b10 : begin
+                              mem_data_to_write <= {data_to_store[15 : 0], 16'd0};
+                        end
+                      
+                        2'b11 : begin
+                              mem_data_to_write <= {data_to_store[7 : 0], 24'd0};
+                        end
+                      
+                        default : begin
+                              mem_data_to_write <= data_to_store;
+                        end
+                          
+                    endcase
+                                        
 
-                    2'b10 : begin
-                        mem_data_to_write <= {data_to_store[15 : 0], 16'd0};
-                    end
-                    
-                    2'b11 : begin
-                        mem_data_to_write <= {data_to_store[7 : 0], 24'd0};
-                    end
-                    
-                    default : begin
-                        mem_data_to_write <= data_to_store;
-                    end
-                    
-                endcase
-                        
-
-
-                    
-                   // mem_re <= ctl_mem_re & mem_read_addr [`MEM_SPACE_BIT];
-                    
                     if (data_access_enable) begin
                         width_reg <= width_load_store;
                         mem_addr_rw_out_tail_reg <= mem_addr_rw_out [1 : 0];
-/*  
-                        if (width_load_store [1 : 0] == 2'b00) begin
-                            width_mask <= 4'b0001 << (mem_write_addr[1 : 0]);
-                        end else if (width_load_store [1 : 0] == 2'b01) begin
-                            width_mask <= 4'b0011 << (mem_write_addr[1 : 0]);
-                        end else begin
-                            width_mask <= 4'b1111;
-                        end
-*/                        
+                      
                     end
-                    
-   /*                 if (ctl_load_mask) begin
-                        case (width_reg)
-                            3'b000 : begin  // LB
-                                load_masked_data <= {{24{mem_data_in_reg[7]}}, mem_data_in_reg[7 : 0]};
-                            end
-                            
-                            3'b001 : begin // LH
-                                load_masked_data <= {{16{mem_data_in_reg[15]}}, mem_data_in_reg[15 : 0]};
-                            end
-                            
-                            3'b100 : begin  // LBU
-                                load_masked_data <= {24'd0, mem_data_in_reg[7 : 0]};
-                            end
-                            
-                            3'b101 : begin // LHU
-                                load_masked_data <= {16'd0, mem_data_in_reg[15 : 0]};
-                            end
-                            
-                            default : begin
-                                load_masked_data <= mem_data_in_reg;
-                            end
-                            
-                        endcase
-                    end
-     */               
                     
                 end 
             end
@@ -431,14 +334,7 @@ module Reindeer_data_access (
         //---------------------------------------------------------------------
         //  exception
         //---------------------------------------------------------------------
-           /* always @(posedge clk, negedge reset_n) begin : exception_proc
-                if (!reset_n) begin
-                    exception_alignment <= 0;
-                end else begin
-                    exception_alignment <= ctl_load_store_exception;
-                end
-            end
-            */
+ 
             assign exception_alignment = ctl_store_exception | ctl_load_exception_d1;
             
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -470,8 +366,6 @@ module Reindeer_data_access (
                 ctl_store_exception      = 0;
                 ctl_store_done           = 0;
                 ctl_load_done            = 0;
-                ctl_load_shift           = 0;
-                ctl_load_mask            = 0;
                 ctl_load_reg_write       = 0;
                 
                 case (1'b1) // synthesis parallel_case 

@@ -110,7 +110,7 @@ module dram_rw_buffer #(parameter BUFFER_SIZE = `DRAM_RW_BUFFER_SIZE) (
     // r/w address
     //=======================================================================
         
-        assign write_addr_next = write_addr + 1;
+        assign write_addr_next = write_addr + ($size(write_addr)'(1));
         assign buffer_overflow = (write_addr_next == read_addr) ? 1'b1 : 1'b0;
         assign buf_cnt = write_addr - read_addr;
         
@@ -118,7 +118,7 @@ module dram_rw_buffer #(parameter BUFFER_SIZE = `DRAM_RW_BUFFER_SIZE) (
             if (!reset_n) begin
                 write_addr <= 0;
             end else if (dram_mem_write_en | dram_mem_read_en) begin
-                write_addr <= write_addr + 1;
+                write_addr <= write_addr + ($size(write_addr))'(1);
             end
         end :  write_addr_proc
 
@@ -132,7 +132,7 @@ module dram_rw_buffer #(parameter BUFFER_SIZE = `DRAM_RW_BUFFER_SIZE) (
                 ctl_inc_read_addr_d1 <= ctl_inc_read_addr;
                     
                 if (ctl_inc_read_addr) begin
-                    read_addr <= read_addr + 1;
+                    read_addr <= read_addr + ($size(read_addr))'(1);
                 end
             end 
         end : read_addr_proc

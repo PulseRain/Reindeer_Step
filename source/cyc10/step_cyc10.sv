@@ -124,7 +124,6 @@ module step_cyc10 (
         wire  [`XLEN - 1 : 0]                   cpu_start_addr;
        
         wire                                    processor_paused;
-        wire                                    processor_active;
         
         logic unsigned [1 : 0]                  init_start = 0;
         logic                                   actual_cpu_start;
@@ -293,8 +292,7 @@ module step_cyc10 (
             .peek_mem_write_en   (),
             .peek_mem_write_data (),
             .peek_mem_addr       ());
-     
-        assign processor_active = ~processor_paused;
+
         assign LED = gpio_out [31 : 24];
         
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -325,7 +323,7 @@ module step_cyc10 (
                     
                     .debug_uart_tx_sel_ocd1_cpu0 (debug_uart_tx_sel_ocd1_cpu0));
                 
-    assign ocd_rw_addr = ocd_read_enable ? pram_read_addr : pram_write_addr;        
+    assign ocd_rw_addr = ocd_read_enable ? pram_read_addr [$high(ocd_rw_addr) : 0] : pram_write_addr [$high(ocd_rw_addr) : 0];        
     
     always_ff @(posedge clk_100MHz, negedge pll_locked) begin : uart_proc
         if (!pll_locked) begin

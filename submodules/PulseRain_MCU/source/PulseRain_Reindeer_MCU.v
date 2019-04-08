@@ -94,7 +94,6 @@ module PulseRain_Reindeer_MCU (
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  
         wire [`MEM_ADDR_BITS - 1 : 0]                           mem_addr;
-        reg  [`MEM_ADDR_BITS - 1 : 0]                           mem_addr_d1;
         
         wire                                                    mem_read_en;
         wire [`XLEN_BYTES - 1 : 0]                              mem_write_en;
@@ -209,13 +208,7 @@ module PulseRain_Reindeer_MCU (
             .dram_rw_pending (dram_rw_pending),
             .mem_addr_ack (mem_addr_ack));  
         
-            always @(posedge clk, negedge reset_n) begin 
-                if (!reset_n) begin
-                    mem_addr_d1 <= 0;
-                end else begin
-                    mem_addr_d1 <= mem_addr;
-                end
-            end
+           
             
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // peripherals 
