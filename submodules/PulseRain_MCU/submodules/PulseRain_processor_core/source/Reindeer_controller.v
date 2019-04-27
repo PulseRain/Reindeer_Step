@@ -96,8 +96,8 @@ module Reindeer_controller (
     // MRET
     //=====================================================================
         
-        input wire                                          mret_active,
-        
+        input  wire                                         mret_active,
+        output wire                                         csr_mret_active,
     //=====================================================================
     // interface for execution unit
     //=====================================================================
@@ -204,6 +204,8 @@ module Reindeer_controller (
                 assign exception_active     = exception_storage_page_fault | exception_ecall | exception_ebreak | ctl_instruction_addr_misalign_exception | exception_alignment;
                 assign exception_active_reg = 
                             exception_storage_page_fault_reg | exception_ecall_reg | exception_ebreak_reg | exception_instruction_addr_misalign_reg | exception_alignment_reg;
+                
+                assign csr_mret_active = ctl_fetch_init_mret_active;
                 
                 always @(posedge clk, negedge reset_n) begin : fetch_proc
                     if (!reset_n) begin

@@ -225,6 +225,7 @@ module PulseRain_Reindeer_core (
         wire  [`PC_BITWIDTH - 1 : 0]                    exception_addr;
         
         wire                                            mret_active;
+        wire                                            csr_mret_active;
         
         wire                                            mul_div_active;
         wire                                            mul_div_done;
@@ -642,17 +643,18 @@ module PulseRain_Reindeer_core (
                 .mem_read_addr   (exe_mem_read_addr),
                 .unaligned_write (exe_unaligned_write),
 
-                .store_done (store_done),
-                .load_done  (load_done),
+                .store_done      (store_done),
+                .load_done       (load_done),
                 
-                .mret_active (mret_active),
+                .mret_active     (mret_active),
+                .csr_mret_active (csr_mret_active),
                 
-                .exe_enable (exe_enable),
+                .exe_enable         (exe_enable),
                 .data_access_enable (data_access_enable),
    
-                .PC_in      (exe_PC_out),
-                .mtvec_in   (mtvec_value),
-                .mepc_in    (mepc_value),
+                .PC_in              (exe_PC_out),
+                .mtvec_in           (mtvec_value),
+                .mepc_in            (mepc_value),
                 
                 .exception_storage_page_fault (csr_exception_storage_page_fault),
                 .exception_ecall              (exception_ecall),
