@@ -99,7 +99,7 @@
 //====================================================================================================================
 
 `define PULSERAIN_JEDEC_VENDOR_ID   (32'h0000055E)
-`define PULSERAIN_RV2T_ARCH_ID      (32'h00200007)
+`define PULSERAIN_RV2T_ARCH_ID      (32'h80200007)
 `define PULSERAIN_RV2T_IMPLEMENT_ID (32'h0A008964)
 `define PULSERAIN_RV2T_ISA          (32'h40000100)
 `define PULSERAIN_RV2T_HART_ID      (32'h00000000)
