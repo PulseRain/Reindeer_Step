@@ -601,7 +601,7 @@ if __name__ == "__main__":
     
     print ("===============================================================================")
     print ("# Copyright (c) 2019, PulseRain Technology LLC ")
-    print ("# Reindeer Configuration Utility, Version 2.2")
+    print ("# Reindeer Configuration Utility, Version 2.3")
     
     
     #=========================================================================
@@ -660,6 +660,8 @@ if __name__ == "__main__":
             print ("Usage:\n  ")
             print ("  Options: \n")
             print ("    -r, --reset          : reset the CPU")
+            print ("    -a, --start_addr     : start address for execution")
+            print ("    -R, --run            : execute from the start address. The start address can come from command line or image file.")
             print ("    -P, --port=          : the name of the COM port, such as COM7")
             print ("    -d, --baud=          : the baud rate, default to be 115200")
             print ("    -t, --toolchain=     : setup the toolchain. By default, ", toolchain, " is used")
