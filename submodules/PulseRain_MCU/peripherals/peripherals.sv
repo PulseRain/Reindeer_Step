@@ -58,7 +58,10 @@ module peripherals (
         input  wire unsigned [`XLEN - 1 : 0]                WB_WR_DAT_I,
         output logic                                        WB_WR_ACK_O,
         
-        
+    //=======================================================================
+    // Interrupt
+    //=======================================================================
+        output  logic                                       int_gen,
     
     //=======================================================================
     // UART
@@ -70,7 +73,9 @@ module peripherals (
     //=======================================================================
     // Debug LED
     //=======================================================================
-        output logic unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_out
+        output logic unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_out,
+        input  wire  unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_in
+        
   
         
 );
@@ -78,10 +83,38 @@ module peripherals (
     //=======================================================================
     // signals
     //=======================================================================
-        wire                                        start_TX;
-        wire [7 : 0]                                tx_data;
-        wire                                        tx_active;
+       
+        //-------------------------------------------------------------------
+        //  UART TX
+        //-------------------------------------------------------------------
+            wire                                        start_TX;
+            wire [7 : 0]                                tx_data;
+            wire                                        tx_active;
         
+        //-------------------------------------------------------------------
+        //  UART RX
+        //-------------------------------------------------------------------
+            wire                                        uart_rx_fifo_read_req;
+            wire                                        uart_rx_enable_out;
+            wire [`UART_DEFAULT_DATA_LEN - 1 : 0]       uart_rx_data_out;
+            wire                                        uart_rx_fifo_full;
+            wire                                        uart_rx_fifo_not_empty;
+            wire                                        uart_rx_sync_reset;
+        
+        //-------------------------------------------------------------------
+        //  External interrupt
+        //-------------------------------------------------------------------
+            logic unsigned [`NUM_OF_INTx - 1 : 0]       INTx_meta;
+            logic unsigned [`NUM_OF_INTx - 1 : 0]       INTx_stable;
+            
+            wire                                        ext_int_active;
+        
+        //-------------------------------------------------------------------
+        //  GPIO
+        //-------------------------------------------------------------------
+            logic unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_in_meta;
+            logic unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_in_stable;
+            
     //=======================================================================
     // write ack
     //=======================================================================
@@ -108,7 +141,19 @@ module peripherals (
                     `UART_TX_ADDR : begin
                         WB_RD_DAT_O <= {tx_active, 31'd0};
                     end
-                
+                    
+                    `UART_RX_ADDR : begin
+                        WB_RD_DAT_O <= {1'b0, uart_rx_fifo_full, uart_rx_fifo_not_empty, 1'b0, ((32 - 4 - (`UART_DEFAULT_DATA_LEN))'(0)), uart_rx_data_out};
+                    end
+                    
+                    `INT_SOURCE_ADDR : begin
+                        WB_RD_DAT_O <= {INTx_stable, (32 - `NUM_OF_TOTAL_INT)'(0),  uart_rx_fifo_not_empty, 1'b0};
+                    end
+                    
+                    `GPIO_ADDR : begin
+                        WB_RD_DAT_O <= gpio_in_stable;
+                    end
+                    
                     default : begin
                         WB_RD_DAT_O <= 0;
                     end
@@ -122,13 +167,13 @@ module peripherals (
 
         /* verilator lint_off WIDTH */
         
-        UART_TX #(.STABLE_TIME(`UART_STABLE_COUNT), .BAUD_PERIOD_BITS(`UART_TX_BAUD_PERIOD_BITS)) UART_TX_i (
-            .clk (clk),
-            .reset_n (reset_n),
+        UART_TX #(.STABLE_TIME(`UART_STABLE_COUNT), .BAUD_PERIOD_BITS(`UART_BAUD_PERIOD_BITS)) UART_TX_i (
+            .clk        (clk),
+            .reset_n    (reset_n),
             .sync_reset (sync_reset),
             
             .start_TX (start_TX),
-            .baud_rate_period_m1 ((`UART_TX_BAUD_PERIOD_BITS)'(`UART_TX_BAUD_PERIOD - 1)),
+            .baud_rate_period_m1 ((`UART_BAUD_PERIOD_BITS)'(`UART_BAUD_PERIOD - 1)),
             .SBUF_in (tx_data),
             .tx_active (tx_active),
             .TXD (TXD));
@@ -136,6 +181,30 @@ module peripherals (
         assign start_TX = ((WB_WR_ADR_I == `UART_TX_ADDR) && WB_WR_WE_I) ? 1'b1 : 1'b0;
         assign tx_data = WB_WR_DAT_I [7 : 0];
 
+    //=======================================================================
+    // UART RX
+    //=======================================================================
+
+    /*    UART_RX_WITH_FIFO #(.STABLE_TIME(`UART_STABLE_COUNT), .BAUD_PERIOD_BITS(`UART_BAUD_PERIOD_BITS), .FIFO_SIZE(`UART_RX_FIFO_SIZE)) UART_RX_i (
+                .clk        (clk),
+                .reset_n    (reset_n),
+                .sync_reset (sync_reset | uart_rx_sync_reset),
+
+                .fifo_read_req (uart_rx_fifo_read_req),
+                .enable_out    (uart_rx_enable_out),
+                .data_out      (uart_rx_data_out),
+                
+                .baud_rate_period_m1 ((`UART_BAUD_PERIOD_BITS)'(`UART_BAUD_PERIOD - 1)),
+                
+                .fifo_full      (uart_rx_fifo_full),
+                .fifo_not_empty (uart_rx_fifo_not_empty),
+                .RXD            (RXD)
+        );
+
+        assign uart_rx_fifo_read_req = ((WB_WR_ADR_I == `UART_RX_ADDR) && WB_WR_WE_I) ? WB_WR_DAT_I[`UART_RX_READ_REQ_BIT] : 1'b0;
+        assign uart_rx_sync_reset    = ((WB_WR_ADR_I == `UART_RX_ADDR) && WB_WR_WE_I) ? WB_WR_DAT_I[`UART_RX_SYNC_RESET_BIT] : 1'b0;
+     */
+    
     //=======================================================================
     // GPIO
     //=======================================================================
@@ -157,22 +226,34 @@ module peripherals (
             
         endgenerate
 
-/*        
-        wire [255 : 0 ] acq_data_in;
-        assign acq_data_in [31 : 0] = WB_WR_DAT_I;
-        assign acq_data_in [34 : 32] = WB_WR_ADR_I;
-        assign acq_data_in [35] = WB_WR_WE_I;
-        assign acq_data_in [39 : 36] = WB_WR_SEL_I;
+        always_ff @(posedge clk, negedge reset_n) begin : gpio_proc
+            if (!reset_n) begin
+                gpio_in_meta   <= 0;
+                gpio_in_stable <= 0;
+            end else begin
+                gpio_in_meta   <= gpio_in;
+                gpio_in_stable <= gpio_in_meta;
+            end
+        end 
+    //=======================================================================
+    // Interrupt
+    //=======================================================================
         
-        assign acq_data_in [255 : 40] = 0;
+        assign ext_int_active = |INTx_stable;
         
-        ocd gpio_stp (
-            .acq_clk (clk), 
-            .acq_data_in (acq_data_in), 
-            .acq_trigger_in ({3'd0, WB_WR_WE_I})
-        );
+        always_ff @(posedge clk, negedge reset_n) begin : int_gen_proc
+            if (!reset_n) begin
+                int_gen <= 0;
+                INTx_meta <= 0;
+                INTx_stable <= 0;
+                
+            end else begin
+                INTx_meta <= INTx;
+                INTx_stable <= INTx_meta;
+                int_gen <= 0; // ext_int_active | uart_rx_fifo_not_empty;
+            end 
+        end
         
-*/
         
 endmodule : peripherals
 
