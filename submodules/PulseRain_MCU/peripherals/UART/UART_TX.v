@@ -26,7 +26,7 @@
 
 `default_nettype none
 
-module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $clog2(`UART_TX_BAUD_PERIOD)) (
+module UART_TX #(parameter STABLE_TIME = `UART_STABLE_COUNT, BAUD_PERIOD_BITS= $clog2(`UART_BAUD_PERIOD)) (
     
     //=======================================================================
     // clock / reset
