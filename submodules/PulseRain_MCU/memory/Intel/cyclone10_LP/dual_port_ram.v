@@ -43,6 +43,12 @@ module dual_port_ram #(parameter ADDR_WIDTH = 5, DATA_WIDTH = 32) (
             
             dout <= mem[raddr] ;
         end
+        
+        initial begin
+            mem[2] <= 32'h807FFFF8;
+        
+        end
+        
 
 endmodule
 
