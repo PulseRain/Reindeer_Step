@@ -377,6 +377,8 @@ module PulseRain_Reindeer_core (
                 .timer_triggered     (timer_triggered),
                 .ext_int_triggered   (ext_int_triggered),
                 
+                .csr_mret_active (mret_active),
+                
                 .activate_exception (activate_exception),
                 .is_interrupt       (is_interrupt),
                 .exception_code     (exception_code),

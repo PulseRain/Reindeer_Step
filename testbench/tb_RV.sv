@@ -107,28 +107,33 @@ module tb_RV #(parameter string TV = "") ();
         assign exe_to_cmp[0] = uut.PulseRain_Reindeer_MCU_i.PulseRain_Reindeer_core_i.Reindeer_execution_unit_i.PC_in;
         assign exe_to_cmp[1] = uut.PulseRain_Reindeer_MCU_i.PulseRain_Reindeer_core_i.Reindeer_execution_unit_i.IR_in;
 
-        single_file_compare #( .NUM_OF_COLUMNS (34), 
-                                .NUM_OF_COLUMNS_TO_DISPLAY(2),
-                                .FILE_NAME({TV}), 
-                                .NUM_OF_LINES(0), 
-                                .BASE(16), 
-                                .LINES_TO_SKIP(0), 
-                                .VERBOSE(1),
-                                .PAUSE_ON_MISMATCH(1), 
-                                .WILDCARD_COMPARE(1),
-                                .CARRIAGE_RETURN(1) ) data_exe_cmp (
-                 
-                 .clk (uut.clk_100MHz),
-                 .reset_n (1'b1),
-            
-                //====== data to compare
-                .data_to_cmp(exe_to_cmp),
-                .enable_in (uut.PulseRain_Reindeer_MCU_i.PulseRain_Reindeer_core_i.Reindeer_execution_unit_i.exe_enable & cmp_enable),
+        
+        generate
+            for (i = 0; i < ((TV == "") ? 0 : 1); i = i + 1) begin
                 
-                .pass1_fail0 (), 
-                .all_done(all_done)
-                ); 
-    
+                single_file_compare #( .NUM_OF_COLUMNS (34), 
+                                        .NUM_OF_COLUMNS_TO_DISPLAY(2),
+                                        .FILE_NAME({TV}), 
+                                        .NUM_OF_LINES(0), 
+                                        .BASE(16), 
+                                        .LINES_TO_SKIP(0), 
+                                        .VERBOSE(1),
+                                        .PAUSE_ON_MISMATCH(1), 
+                                        .WILDCARD_COMPARE(1),
+                                        .CARRIAGE_RETURN(1) ) data_exe_cmp (
+                         
+                         .clk (uut.clk_100MHz),
+                         .reset_n (1'b1),
+                    
+                        //====== data to compare
+                        .data_to_cmp(exe_to_cmp),
+                        .enable_in (uut.PulseRain_Reindeer_MCU_i.PulseRain_Reindeer_core_i.Reindeer_execution_unit_i.exe_enable & cmp_enable),
+                        
+                        .pass1_fail0 (), 
+                        .all_done(all_done)
+                        ); 
+            end
+        endgenerate
     
     //========================================================================
     // clock
@@ -138,7 +143,7 @@ module tb_RV #(parameter string TV = "") ();
             forever begin 
                 #(OSC_PERIOD/2);
                 
-                if (all_done) begin
+                if ((all_done) && (TV != "")) begin
                     break;
                 end else begin
                     osc = (~osc);
