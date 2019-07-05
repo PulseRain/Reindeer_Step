@@ -158,6 +158,7 @@ module Reindeer_controller (
             reg                                             ctl_paused;
             
             reg                                             ctl_set_timer_interrupt_active;
+            reg                                             ctl_interrupt_set_reg;
             reg                                             ctl_set_timer_interrupt_active_reg;
             reg                                             ctl_set_ext_interrupt_active;
             reg                                             ctl_set_ext_interrupt_active_reg;
@@ -198,6 +199,7 @@ module Reindeer_controller (
             reg                                             load_active_d1;
             reg                                             store_active_d1;
                 
+            reg                                             fetch_init_active;
             
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // data path
@@ -254,6 +256,10 @@ module Reindeer_controller (
                         load_active_d1 <= 0;
                         store_active_d1 <= 0;
                         
+                        fetch_init_active <= 0;
+                        
+                        ctl_interrupt_set_reg <= 0;
+                        
                     end else begin
                                     
                         load_active_d1 <= load_active;
@@ -280,6 +286,14 @@ module Reindeer_controller (
                             fetch_active <= 0;
                         end
                         
+                        if (fetch_init) begin
+                            fetch_init_active <= 1'b1;
+                        end else if (ctl_exe_enable) begin
+                            fetch_init_active <= 1'b0;
+                        end
+                        
+                        ctl_interrupt_set_reg <= ctl_set_timer_interrupt_active + ctl_set_ext_interrupt_active;
+                        
                         if (exception_ebreak | exception_ecall | exception_storage_page_fault | ctl_instruction_addr_misalign_exception ) begin
                             exception_PC <= PC_in;
                         end else if (exception_alignment) begin
@@ -290,8 +304,20 @@ module Reindeer_controller (
                                 exception_PC <= PC_in;
                             end
                             
-                        end else if ((data_access_enable & decode_ctl_WFI_d1) | ctl_set_timer_interrupt_active | ctl_set_ext_interrupt_active) begin
+                        end else if (data_access_enable & decode_ctl_WFI_d1) begin
                             exception_PC <= PC_in + 4;
+                        end else if (ctl_set_timer_interrupt_active | ctl_set_ext_interrupt_active) begin
+                            
+                            if (fetch_init_active | fetch_init) begin
+                                exception_PC <= fetch_start_addr;
+                            end else if (ctl_back_to_exe_d1) begin
+                                exception_PC <= PC_in;
+                            end else begin
+                                exception_PC <= PC_in  + 4;
+                            end
+                        end else if (ctl_interrupt_set_reg & fetch_init) begin
+                            // This could happen when the timer hits an active branch/jump instruction
+                            exception_PC <= fetch_start_addr;
                         end 
                         
                         if (data_access_enable) begin
@@ -325,13 +351,13 @@ module Reindeer_controller (
                                 
                         if (ctl_set_timer_interrupt_active) begin
                             timer_interrupt_active <= 1'b1;
-                        end else if (!timer_triggered) begin
+                        end else if (mret_active) begin
                             timer_interrupt_active <= 0;
                         end
                         
                         if (ctl_set_ext_interrupt_active) begin
                             ext_interrupt_active <= 1'b1;
-                        end else if (!ext_int_triggered) begin
+                        end else if (mret_active) begin
                             ext_interrupt_active <= 0;
                         end
                                                 

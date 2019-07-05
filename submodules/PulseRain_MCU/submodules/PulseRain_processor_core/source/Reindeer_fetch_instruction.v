@@ -210,13 +210,20 @@ module Reindeer_fetch_instruction (
                     end
                     
                     current_state [S_WAIT_DRAM] : begin
-                        if (dram_rw_pending) begin
+                        
+                        if (dram_rw_pending | fetch_init) begin
+                            // Timer interrupt could happen at this point
                             ctl_mem_ack_suppress = 1'b1;
                             next_state [S_WAIT_DRAM] = 1'b1;
                         end else begin
                             ctl_read_mem_enable = 1'b1;
                             next_state [S_FETCH] = 1'b1;
                         end
+                        
+                        if (fetch_init) begin
+                            ctl_load_start_addr = 1'b1;
+                        end 
+                        
                     end
                     
           

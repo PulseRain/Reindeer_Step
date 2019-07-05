@@ -187,9 +187,9 @@ module Reindeer_CSR (
                     mstatus_mpie <= mstatus_mie;
                 end else begin
                     
-                    if (csr_mret_active) begin
-                        mstatus_mie <= mstatus_mpie;
-                    end
+                    //if (csr_mret_active) begin
+                    //    mstatus_mie <= mstatus_mpie;
+                    //end
                     
                     if (read_enable) begin
                         case (read_addr) // synthesis parallel_case
