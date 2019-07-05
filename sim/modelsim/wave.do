@@ -1,5 +1,14 @@
 onerror {resume}
 quietly WaveActivateNextPane {} 0
+add wave -noupdate -divider fetch
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/fetch_init
+add wave -noupdate -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/start_addr
+add wave -noupdate -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/read_mem_addr
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/mem_read_done
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/dram_rw_pending
+add wave -noupdate -radix binary /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/current_state
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/ctl_mem_ack_suppress
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/ctl_save_start_addr
 add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/mem_controller_i/mem_read_en
 add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/fetch_enable_out
 add wave -noupdate -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_fetch_instruction_i/PC_out
@@ -16,6 +25,10 @@ add wave -noupdate -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseR
 add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/mem_controller_i/dram_rw_buffer_i/dram_rw_pending
 add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/activate_exception
 add wave -noupdate -divider exe
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/mie_out
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/mtie_out
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/mtip_out
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/exception_active
 add wave -noupdate -childformat {{{/tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_reg_file_i/single_clk_ram_rs1/mem[2]} -radix hexadecimal}} -subitemconfig {{/tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_reg_file_i/single_clk_ram_rs1/mem[2]} {-height 15 -radix hexadecimal}} /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_reg_file_i/single_clk_ram_rs1/mem
 add wave -noupdate -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_mm_reg_i/Reindeer_machine_timer_i/mtime
 add wave -noupdate -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_mm_reg_i/Reindeer_machine_timer_i/mtimecmp
@@ -25,11 +38,14 @@ add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i
 add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/timer_interrupt_active
 add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/ctl_set_timer_interrupt_active_reg
 add wave -noupdate -color Magenta -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/PC_in
-add wave -noupdate -color Gold /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/ctl_set_timer_interrupt_active
-add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/ctl_capture_interrupt_mepc
-add wave -noupdate -color Yellow -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/next_exe_addr
-add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_execution_unit_i/exe_enable
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/ctl_back_to_exe
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/ctl_back_to_exe_d1
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/ctl_back_to_exe_d2
+add wave -noupdate -color Magenta /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/fetch_init_active
 add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/load_active
+add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/load_done
+add wave -noupdate -color Gold /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_controller_i/ctl_set_timer_interrupt_active
+add wave -noupdate -color Magenta /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_execution_unit_i/exe_enable
 add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/data_access_enable
 add wave -noupdate -color Yellow -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_execution_unit_i/PC_in
 add wave -noupdate -color Yellow -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/PulseRain_Reindeer_core_i/Reindeer_execution_unit_i/IR_in
@@ -127,8 +143,8 @@ add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/mem_controller_i/dram_rw_
 add wave -noupdate /tb_RV/uut/PulseRain_Reindeer_MCU_i/mem_controller_i/dram_rw_buffer_i/dram_ack
 add wave -noupdate -radix hexadecimal /tb_RV/uut/PulseRain_Reindeer_MCU_i/mem_controller_i/dram_rw_buffer_i/dram_mem_read_data
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {52058181 ps} 1} {{Cursor 2} {1768782823 ps} 1} {{Cursor 3} {752930000 ps} 0}
-quietly wave cursor active 3
+WaveRestoreCursors {{Cursor 1} {52058181 ps} 1} {{Cursor 2} {1768782823 ps} 1} {{Cursor 3} {655232669 ps} 1} {{Cursor 4} {1797260725 ps} 1}
+quietly wave cursor active 4
 configure wave -namecolwidth 214
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -143,4 +159,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {97460095675 ps} {100133679175 ps}
+WaveRestoreZoom {0 ps} {2156366625 ps}
