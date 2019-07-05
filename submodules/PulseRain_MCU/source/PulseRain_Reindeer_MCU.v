@@ -232,11 +232,14 @@ module PulseRain_Reindeer_MCU (
             .WB_WR_ADR_I (WB_WR_ADR),
             .WB_WR_DAT_I (WB_WR_DAT),
             .WB_WR_ACK_O (WB_WR_ACK),
+            
+            .int_gen (),
         
             .RXD         (RXD),
             .TXD         (TXD),
         
-            .gpio_out    (GPIO_OUT));
+            .gpio_out    (GPIO_OUT),
+            .gpio_in     (0));
   
         assign  peek_mem_write_en   = mem_write_en;
         assign  peek_mem_write_data = mem_write_data;
