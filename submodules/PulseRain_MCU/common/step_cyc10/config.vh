@@ -39,7 +39,7 @@
 `define MEM_ADDR_BITS        (`DRAM_ADDR_BITS)
 
 
-`define MM_REG_SIZE_IN_BYTES   (32)
+`define MM_REG_SIZE_IN_BYTES   (128)
 `define MM_REG_ADDR_BITS       ($clog2(`MM_REG_SIZE_IN_BYTES / 4))
 
 `define DEFAULT_STACK_ADDR    ((`SRAM_SIZE_IN_BYTES == 0) ? (((`DRAM_SIZE_IN_BYTES) - 8)| 32'h80000000)  : (((`SRAM_SIZE_IN_BYTES) - 8)| 32'h80000000)) 
@@ -53,34 +53,56 @@
 //  peripheral addresses
 //----------------------------------------------------------------------------
     
-    `define NUM_OF_INTx                        2
-    
     //------------------------------------------------------------------------
     //  Timer
     //------------------------------------------------------------------------
 
-    `define MTIME_LOW_ADDR                     (3'b000)
-    `define MTIME_HIGH_ADDR                    (3'b001)
+    `define MTIME_LOW_ADDR                     ((`MM_REG_ADDR_BITS)'(0))
+    `define MTIME_HIGH_ADDR                    ((`MM_REG_ADDR_BITS)'(1))
 
-    `define MTIMECMP_LOW_ADDR                  (3'b010)
-    `define MTIMECMP_HIGH_ADDR                 (3'b011)
+    `define MTIMECMP_LOW_ADDR                  ((`MM_REG_ADDR_BITS)'(2))
+    `define MTIMECMP_HIGH_ADDR                 ((`MM_REG_ADDR_BITS)'(3))
 
 
     //------------------------------------------------------------------------
     //  UART
     //------------------------------------------------------------------------
 
-    `define UART_TX_ADDR                       (3'b100)
-    `define UART_BAUD_RATE                      115200
-    `define UART_TX_BAUD_PERIOD                (`MCU_MAIN_CLK_RATE / `UART_BAUD_RATE)
-    `define UART_TX_BAUD_PERIOD_BITS           ($clog2(`UART_TX_BAUD_PERIOD))
-    `define UART_STABLE_COUNT                  (`MCU_MAIN_CLK_RATE  / `UART_BAUD_RATE / 2)
+    `define UART_TX_ADDR                       ((`MM_REG_ADDR_BITS)'(4))
+    `define UART_RX_ADDR                       ((`MM_REG_ADDR_BITS)'(5))
 
+    `define UART_BAUD_RATE                      115200
+    `define UART_BAUD_PERIOD                   (`MCU_MAIN_CLK_RATE / `UART_BAUD_RATE)
+    `define UART_BAUD_PERIOD_BITS              ($clog2(`UART_BAUD_PERIOD))
+    `define UART_STABLE_COUNT                  (`MCU_MAIN_CLK_RATE  / `UART_BAUD_RATE / 2)
+    `define UART_DEFAULT_DATA_LEN               8
+    `define UART_RX_FIFO_SIZE                   1024
+    
+    `define UART_RX_READ_REQ_BIT                31
+    `define UART_RX_SYNC_RESET_BIT              28
+    
     //------------------------------------------------------------------------
     //  GPIO
     //------------------------------------------------------------------------	
-    `define GPIO_ADDR                          (3'b110)
+    `define GPIO_ADDR                          ((`MM_REG_ADDR_BITS)'(6))
     `define NUM_OF_GPIOS                       32 
+    
+    //------------------------------------------------------------------------
+    //  Interrupt
+    //------------------------------------------------------------------------
+    `define INT_SOURCE_ADDR                    ((`MM_REG_ADDR_BITS)'(7))
+    
+    // Interrupt external to the MCU
+    `define NUM_OF_INTx                        2
+    
+    // Num of total Interrupts, including Timer
+    `define NUM_OF_TOTAL_INT                   (`NUM_OF_INTx + 2)
+    
+    `define INT_TIMER_INDEX                    0
+    `define INT_UART_RX_INDEX                  1
+    `define INT_EXT_INDEX_1ST                  (32 - `NUM_OF_INTx)
+    `define INT_EXT_INDEX_LAST                 31
+    
     
 //----------------------------------------------------------------------------
 //  hardware mul/div
