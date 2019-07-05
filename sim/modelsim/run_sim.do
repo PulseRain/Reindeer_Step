@@ -4,4 +4,4 @@ set StdArithNoWarnings 1;list
 set NumericStdNoWarnings 1;list
 
 add log -r sim:/*
-    
+do wave.do
