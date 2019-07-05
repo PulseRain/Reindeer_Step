@@ -49,7 +49,7 @@ set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
 set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.2V
 
 
-set_global_assignment -name NUM_PARALLEL_PROCESSORS 4
+set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
 
 set_location_assignment PIN_D15 -to reset_n
 set_location_assignment PIN_M15 -to osc_in
@@ -109,6 +109,20 @@ set_location_assignment PIN_B3 -to SDRAM_WE_N
 set_location_assignment PIN_C8 -to SDRAM_DQM[0]
 set_location_assignment PIN_A11 -to SDRAM_DQM[1]
 
+
+set_location_assignment PIN_L8 -to SEG_DIG4
+set_location_assignment PIN_P6 -to SEG_DIG3
+set_location_assignment PIN_M7 -to SEG_DIG2
+set_location_assignment PIN_L7 -to SEG_DIG1
+set_location_assignment PIN_L14 -to SEG_A
+set_location_assignment PIN_N14 -to SEG_B
+set_location_assignment PIN_N12 -to SEG_C
+set_location_assignment PIN_N11 -to SEG_D
+set_location_assignment PIN_P11 -to SEG_E
+set_location_assignment PIN_P14 -to SEG_F
+set_location_assignment PIN_L13 -to SEG_G
+set_location_assignment PIN_R14 -to SEG_DP
+
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
@@ -134,4 +148,5 @@ set_global_assignment -name QIP_FILE ../../../cores/DDIO_OUT/DDIO_OUT.qip
 set_global_assignment -name QIP_FILE ../../../cores/PLL/PLL.qip
 set_global_assignment -name QIP_FILE ../../../submodules/HW_Loader/synth/HW_Loader.qip
 set_global_assignment -name SYSTEMVERILOG_FILE ../../../source/cyc10/step_cyc10.sv
+set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
