@@ -61,6 +61,19 @@ module tb_RV #(parameter string TV = "") ();
                     
                     .LED (),
                     
+                    .SEG_A (),
+                    .SEG_B (),
+                    .SEG_C (),
+                    .SEG_D (),
+                    .SEG_E (),
+                    .SEG_F (),
+                    .SEG_G (),
+                    .SEG_DP (),
+                    .SEG_DIG4 (),
+                    .SEG_DIG3 (),
+                    .SEG_DIG2 (),
+                    .SEG_DIG1 (),
+                    
                     .SDRAM_ADDR (SDRAM_ADDR),
                     .SDRAM_BA (SDRAM_BA),
                     .SDRAM_CAS_N (SDRAM_CAS_N),
