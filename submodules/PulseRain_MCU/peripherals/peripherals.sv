@@ -185,7 +185,7 @@ module peripherals (
     // UART RX
     //=======================================================================
 
-    /*    UART_RX_WITH_FIFO #(.STABLE_TIME(`UART_STABLE_COUNT), .BAUD_PERIOD_BITS(`UART_BAUD_PERIOD_BITS), .FIFO_SIZE(`UART_RX_FIFO_SIZE)) UART_RX_i (
+        UART_RX_WITH_FIFO #(.STABLE_TIME(`UART_STABLE_COUNT), .BAUD_PERIOD_BITS(`UART_BAUD_PERIOD_BITS), .FIFO_SIZE(`UART_RX_FIFO_SIZE)) UART_RX_i (
                 .clk        (clk),
                 .reset_n    (reset_n),
                 .sync_reset (sync_reset | uart_rx_sync_reset),
@@ -203,7 +203,7 @@ module peripherals (
 
         assign uart_rx_fifo_read_req = ((WB_WR_ADR_I == `UART_RX_ADDR) && WB_WR_WE_I) ? WB_WR_DAT_I[`UART_RX_READ_REQ_BIT] : 1'b0;
         assign uart_rx_sync_reset    = ((WB_WR_ADR_I == `UART_RX_ADDR) && WB_WR_WE_I) ? WB_WR_DAT_I[`UART_RX_SYNC_RESET_BIT] : 1'b0;
-     */
+     
     
     //=======================================================================
     // GPIO
@@ -250,7 +250,7 @@ module peripherals (
             end else begin
                 INTx_meta <= INTx;
                 INTx_stable <= INTx_meta;
-                int_gen <= 0; // ext_int_active | uart_rx_fifo_not_empty;
+                int_gen <= ext_int_active | uart_rx_fifo_not_empty;
             end 
         end
         
