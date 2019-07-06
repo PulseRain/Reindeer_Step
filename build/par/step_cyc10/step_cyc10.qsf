@@ -139,14 +139,13 @@ set_global_assignment -name PLACEMENT_EFFORT_MULTIPLIER 13
 set_global_assignment -name ROUTER_EFFORT_MULTIPLIER 10
 set_global_assignment -name SEED 13
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to reset_n
+set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
 set_global_assignment -name VERILOG_FILE ../../../submodules/PulseRain_MCU/memory/dram_rw_buffer.v
 set_global_assignment -name QIP_FILE ../../../submodules/PulseRain_MCU/synth/PulseRain_MCU.qip
 set_global_assignment -name SDC_FILE ../constraints/step_cyc10.sdc
-set_global_assignment -name QIP_FILE ../../../cores/signal_tap/ocd/ocd/synthesis/ocd.qip
 set_global_assignment -name QIP_FILE ../../../cores/sdram/sdram/synthesis/sdram.qip
 set_global_assignment -name QIP_FILE ../../../cores/DDIO_OUT/DDIO_OUT.qip
 set_global_assignment -name QIP_FILE ../../../cores/PLL/PLL.qip
 set_global_assignment -name QIP_FILE ../../../submodules/HW_Loader/synth/HW_Loader.qip
 set_global_assignment -name SYSTEMVERILOG_FILE ../../../source/cyc10/step_cyc10.sv
-set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

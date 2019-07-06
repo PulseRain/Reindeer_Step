@@ -1,8 +1,0 @@
-	component ocd is
-		port (
-			acq_clk        : in std_logic                      := 'X';             -- clk
-			acq_data_in    : in std_logic_vector(255 downto 0) := (others => 'X'); -- acq_data_in
-			acq_trigger_in : in std_logic_vector(3 downto 0)   := (others => 'X')  -- acq_trigger_in
-		);
-	end component ocd;
-
