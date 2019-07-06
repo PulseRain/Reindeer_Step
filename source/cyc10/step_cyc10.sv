@@ -266,6 +266,8 @@ module step_cyc10 (
             .clk (clk_100MHz),
             .reset_n ((~cpu_reset) & pll_locked),
             .sync_reset (1'b0),
+            
+            .INTx (2'b00),
 
             .ocd_read_enable (ocd_read_enable),
             .ocd_write_enable (ocd_write_enable),
@@ -284,6 +286,7 @@ module step_cyc10 (
             .RXD (RXD),
             .TXD (uart_tx_cpu),
             
+            .GPIO_IN (0),
             .GPIO_OUT(gpio_out),
     
             .start (actual_cpu_start),
