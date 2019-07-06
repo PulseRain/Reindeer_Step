@@ -50,7 +50,12 @@ vlog -sv -work work +incdir+$common +incdir+$config ../../submodules/PulseRain_M
 vlog -work work +incdir+$common +incdir+$config ../../submodules/PulseRain_MCU/submodules/PulseRain_processor_core/source/Reindeer_mm_reg.v
 
 vlog -sv -work work +incdir+$common +incdir+$config ../../submodules/PulseRain_MCU/peripherals/UART/UART_TX.v
+vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/peripherals/UART/UART_RX.sv
+vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/peripherals/UART/UART_RX_WITH_FIFO.sv
+vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/peripherals/UART/UART_FIFO.sv
 vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/peripherals/peripherals.sv
+
+
 
 
 vlog -work work +incdir+$common +incdir+$config ../../submodules/HW_Loader/source/CRC16_CCITT.v
