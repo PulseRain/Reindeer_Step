@@ -5,6 +5,9 @@ set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../mem
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../memory/mem_controller.v"]
 
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../peripherals/UART/UART_TX.v"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../peripherals/UART/UART_FIFO.sv"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../peripherals/UART/UART_RX.sv"]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../peripherals/UART/UART_RX_WITH_FIFO.sv"]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../peripherals/peripherals.sv"]
 
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "../source/PulseRain_Reindeer_MCU.v"]
