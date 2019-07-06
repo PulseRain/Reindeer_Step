@@ -30,7 +30,12 @@ module PulseRain_Reindeer_MCU (
         input   wire                                            reset_n,                      
         input   wire                                            sync_reset,
 
-    
+
+    //=====================================================================
+    // External Interrupt
+    //=====================================================================
+        input   wire [`NUM_OF_INTx - 1 : 0]                     INTx,    
+        
     //=====================================================================
     // Interface Onchip Debugger
     //=====================================================================
@@ -57,6 +62,7 @@ module PulseRain_Reindeer_MCU (
     //=====================================================================
     // GPIO
     //=====================================================================
+        input   wire  unsigned [`NUM_OF_GPIOS - 1 : 0]          GPIO_IN,
         output  wire  unsigned [`NUM_OF_GPIOS - 1 : 0]          GPIO_OUT,
     //=====================================================================
     // Interface for init/start
@@ -123,6 +129,8 @@ module PulseRain_Reindeer_MCU (
         wire unsigned [`XLEN - 1 : 0]                           WB_WR_DAT;
         wire                                                    WB_WR_ACK;
         
+        wire                                                    int_gen;
+        
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // processor core
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -146,7 +154,7 @@ module PulseRain_Reindeer_MCU (
                 .ocd_reg_write_addr (ocd_reg_write_addr),
                 .ocd_reg_write_data (ocd_reg_write_data),
                 
-                .ext_int_triggered (1'b0),
+                .ext_int_triggered (int_gen),
                 
                 .WB_RD_CYC_O (WB_RD_CYC),
                 .WB_RD_STB_O (WB_RD_STB),
@@ -219,7 +227,7 @@ module PulseRain_Reindeer_MCU (
             .reset_n            (reset_n),
             .sync_reset         (sync_reset),
         
-            .INTx               (2'b00),
+            .INTx               (INTx),
         
             .WB_RD_STB_I (WB_RD_STB),
             .WB_RD_ADR_I (WB_RD_ADR),
@@ -233,13 +241,13 @@ module PulseRain_Reindeer_MCU (
             .WB_WR_DAT_I (WB_WR_DAT),
             .WB_WR_ACK_O (WB_WR_ACK),
             
-            .int_gen (),
+            .int_gen     (int_gen),
         
             .RXD         (RXD),
             .TXD         (TXD),
         
             .gpio_out    (GPIO_OUT),
-            .gpio_in     (0));
+            .gpio_in     (GPIO_IN));
   
         assign  peek_mem_write_en   = mem_write_en;
         assign  peek_mem_write_data = mem_write_data;
