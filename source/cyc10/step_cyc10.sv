@@ -55,13 +55,13 @@ module step_cyc10 (
     //  RGB LED
     //------------------------------------------------------------------------
 
-       // output wire                     REG_LED1_R,
-       // output wire                     REG_LED1_G,
-       // output wire                     REG_LED1_B,
+        output wire                     REG_LED1_R,
+        output wire                     REG_LED1_G,
+        output wire                     REG_LED1_B,
 
-       // output wire                     REG_LED2_R,
-       // output wire                     REG_LED2_G,
-       // output wire                     REG_LED2_B,
+        output wire                     REG_LED2_R,
+        output wire                     REG_LED2_G,
+        output wire                     REG_LED2_B,
 
    //------------------------------------------------------------------------
     //  7 Segment Display
@@ -309,6 +309,10 @@ module step_cyc10 (
             .peek_mem_write_data (),
             .peek_mem_addr       ());
 
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // GPIO
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
         assign LED = gpio_out [31 : 24];
         
         assign SEG_A  = ~gpio_out [0];
@@ -324,6 +328,15 @@ module step_cyc10 (
         assign SEG_DIG3 = gpio_out[9];
         assign SEG_DIG2 = gpio_out[10];
         assign SEG_DIG1 = gpio_out[11];
+        
+        assign REG_LED1_R = gpio_out [16];
+        assign REG_LED1_G = gpio_out [17];
+        assign REG_LED1_B = gpio_out [18];
+        
+        assign REG_LED2_R = gpio_out [20];
+        assign REG_LED2_G = gpio_out [21];
+        assign REG_LED2_B = gpio_out [22];
+        
         
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Hardware Loader
