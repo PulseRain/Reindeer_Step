@@ -1,3 +1,19 @@
+//============================================================================================
+//  Memory Stress Test with PRBS
+//    Please define the memory buffer size below
+//============================================================================================
+
+#define MEM_TEST_SIZE_IN_BYTES (4*1024*1024)
+uint32_t mem_buf [MEM_TEST_SIZE_IN_BYTES/4];
+
+
+
+
+
+//============================================================================================
+// Class for PRBS
+//============================================================================================
+
 class PRBS
 {
     public:
@@ -59,12 +75,17 @@ class PRBS
         uint32_t mask_;
 };
 
-#define MEM_TEST_SIZE_IN_BYTES (4*1024*1024)
 
-uint32_t mem_buf [MEM_TEST_SIZE_IN_BYTES/4];
 
+uint32_t seed = 0xdeadbeef;
+uint32_t update_interval = 16384;
 
 PRBS prbs (31, 0xdeadbeef);
+
+
+//============================================================================================
+// setup() and loop()
+//============================================================================================
 
 void setup() {
 
@@ -74,15 +95,17 @@ void setup() {
 
 void loop() {
   
-  uint32_t t;
+  uint32_t t, round = 0;
   Serial.println ("Write PRBS");
 
-  prbs.reset (31, 0xdeadbeef);
+  prbs.reset (31, seed);
   
   for (int i = 0; i < MEM_TEST_SIZE_IN_BYTES / 4; ++i) {
       mem_buf[i] = prbs.get_next();
-      if ((i % 1024) == 0) {
-          Serial.print("write complete ");
+      if ((i % update_interval) == 0) {
+          Serial.print ("Round ");
+          Serial.print (round);
+          Serial.print(" write complete ");
           Serial.print (i);
           Serial.print ("/");
           Serial.print(MEM_TEST_SIZE_IN_BYTES);
@@ -95,7 +118,7 @@ void loop() {
 
   
   Serial.println ("Memory read/verify");
-  prbs.reset (31, 0xdeadbeef);
+  prbs.reset (31, seed);
   
   for (int i = 0; i < MEM_TEST_SIZE_IN_BYTES / 4; ++i) {
       t = prbs.get_next();
@@ -108,8 +131,10 @@ void loop() {
           while(1);
       }
       
-      if ((i % 1024) == 0) {
-          Serial.print("read complete ");
+      if ((i % update_interval) == 0) {
+          Serial.print ("Round ");
+          Serial.print (round);
+          Serial.print(" read complete ");
           Serial.print (i);
           Serial.print ("/");
           Serial.print(MEM_TEST_SIZE_IN_BYTES);
@@ -119,5 +144,8 @@ void loop() {
   }
 
   Serial.println ("Mem Test Pass!!!!!!!!!!");
+
+  ++seed;
+  ++round;
  
 }
