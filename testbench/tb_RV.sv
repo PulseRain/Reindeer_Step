@@ -51,15 +51,26 @@ module tb_RV #(parameter string TV = "") ();
 
             step_cyc10 uut (
                     .osc_in (osc),
-                    .reset_n (1'b1),          
-                    
+                                       
                     .RXD (1'b1),
                     .TXD (),
                     
                     .ADXL345_SCL (),
                     .ADXL345_SDA (), 
+                    .ADXL345_CS  (),
+                    .ADXL345_INT1 (1'b0),
+                    .ADXL345_INT2 (1'b0),
                     
                     .LED (),
+                    
+                    .REG_LED1_R (),
+                    .REG_LED1_G (),
+                    .REG_LED1_B (),
+                    
+                    .REG_LED2_R (),
+                    .REG_LED2_G (),
+                    .REG_LED2_B (),
+        
                     
                     .SEG_A (),
                     .SEG_B (),
@@ -73,6 +84,21 @@ module tb_RV #(parameter string TV = "") ();
                     .SEG_DIG3 (),
                     .SEG_DIG2 (),
                     .SEG_DIG1 (),
+                    
+                    .KEY1 (1'b0),
+                    .KEY2 (1'b0),
+                    .KEY3 (1'b0),
+                    .KEY4 (1'b0),
+                    .KEY5 (1'b0),
+                    
+                    .SW1 (1'b1),
+                    .SW2 (1'b1),
+                    .SW3 (1'b0),
+                    .SW4 (1'b1),
+                    .SW5 (1'b0),
+                    .SW6 (1'b0),
+                    .SW7 (1'b0),
+                    .SW8 (1'b1),
                     
                     .SDRAM_ADDR (SDRAM_ADDR),
                     .SDRAM_BA (SDRAM_BA),
