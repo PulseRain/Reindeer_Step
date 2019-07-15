@@ -64,6 +64,17 @@ module PulseRain_Reindeer_MCU (
     //=====================================================================
         input   wire  unsigned [`NUM_OF_GPIOS - 1 : 0]          GPIO_IN,
         output  wire  unsigned [`NUM_OF_GPIOS - 1 : 0]          GPIO_OUT,
+        
+    //=====================================================================
+    // I2C
+    //=====================================================================
+        input wire                                              sda_in, 
+        input wire                                              scl_in,
+        
+        output wire                                             sda_out,
+        output wire                                             scl_out,
+         
+    
     //=====================================================================
     // Interface for init/start
     //=====================================================================
@@ -247,7 +258,15 @@ module PulseRain_Reindeer_MCU (
             .TXD         (TXD),
         
             .gpio_out    (GPIO_OUT),
-            .gpio_in     (GPIO_IN));
+            .gpio_in     (GPIO_IN),
+            
+            .sda_in      (sda_in),
+            .scl_in      (scl_in),
+            
+            .sda_out     (sda_out),
+            .scl_out     (scl_out)
+         
+            );
   
         assign  peek_mem_write_en   = mem_write_en;
         assign  peek_mem_write_data = mem_write_data;

@@ -29,7 +29,6 @@ module step_cyc10 (
     //------------------------------------------------------------------------
     
         input   wire                    osc_in,     
-        input   wire                    reset_n,          
         
     //------------------------------------------------------------------------
     //  UART
@@ -42,9 +41,13 @@ module step_cyc10 (
     //  3-Axis Digital Accelerometer
     //------------------------------------------------------------------------
         
-        output  wire                    ADXL345_SCL,    
-        inout   wire                    ADXL345_SDA, 
-
+        inout   wire                    ADXL345_SCL,    
+        inout   wire                    ADXL345_SDA,
+        output  wire                    ADXL345_CS,
+        
+        input   wire                    ADXL345_INT1,
+        input   wire                    ADXL345_INT2,
+        
     //------------------------------------------------------------------------
     //  Single Color LED
     //------------------------------------------------------------------------
@@ -63,7 +66,7 @@ module step_cyc10 (
         output wire                     REG_LED2_G,
         output wire                     REG_LED2_B,
 
-   //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
     //  7 Segment Display
     //------------------------------------------------------------------------
         output  wire                    SEG_DIG1,
@@ -79,7 +82,28 @@ module step_cyc10 (
         output  wire                    SEG_F,
         output  wire                    SEG_G,
         output  wire                    SEG_DP,
-        
+ 
+    //------------------------------------------------------------------------
+    //  5 way navigation switch
+    //------------------------------------------------------------------------
+        input   wire                    KEY1,
+        input   wire                    KEY2,
+        input   wire                    KEY3,
+        input   wire                    KEY4,
+        input   wire                    KEY5,
+    
+    //------------------------------------------------------------------------
+    //  DIP Switch
+    //------------------------------------------------------------------------
+        input   wire                    SW1,
+        input   wire                    SW2,
+        input   wire                    SW3,
+        input   wire                    SW4,
+        input   wire                    SW5,
+        input   wire                    SW6,
+        input   wire                    SW7,
+        input   wire                    SW8,
+    
     //------------------------------------------------------------------------
     //  SDRAM
     //------------------------------------------------------------------------
@@ -105,6 +129,8 @@ module step_cyc10 (
         wire                                    clk_12MHz;
 
         wire                                    pll_locked;
+        
+        wire                                    reset_n;        
                 
         wire unsigned [21 : 0]                  sdram_slave_address;
         wire unsigned [1 : 0]                   sdram_slave_byteenable_n;
@@ -152,11 +178,21 @@ module step_cyc10 (
         wire  [`XLEN_BYTES - 1 : 0]             dram_mem_byte_enable;
         wire  [`XLEN - 1 : 0]                   dram_mem_write_data;
         wire  unsigned [`NUM_OF_GPIOS - 1 : 0]  gpio_out;
+        wire  unsigned [`NUM_OF_GPIOS - 1 : 0]  gpio_in;
         
+        wire  [4 : 0]                           five_way_keys;
+        wire  [4 : 0]                           five_way_keys_debounced;
+        logic                                   int0;
+      
+        wire                                    sda_out;
+        wire                                    scl_out;
+              
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // PLL
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+        assign reset_n = 1'b1;
+        
         PLL pll_i (
             .areset(~reset_n),
             .inclk0 (osc_in),  // 50MHz clock in
@@ -243,6 +279,48 @@ module step_cyc10 (
 
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // 5 way navigation switch
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+        assign five_way_keys[0] = KEY1;
+        assign five_way_keys[1] = KEY2;
+        assign five_way_keys[2] = KEY3;
+        assign five_way_keys[3] = KEY4;
+        assign five_way_keys[4] = KEY5;
+        
+        genvar i;
+        
+        generate
+            
+            for (i = 0; i < 5; i = i + 1) begin: gen_keys
+            
+                
+                switch_debouncer  #(.TIMER_VALUE (100000)) switch_debouncer_i (
+                    .clk (clk_100MHz),
+                    .reset_n (pll_locked),
+            
+                    .data_in (five_way_keys[i]),
+                    .data_out (five_way_keys_debounced[i])
+                );
+                
+            end 
+            
+        endgenerate
+        
+        
+        assign gpio_in[4 : 0] = ~five_way_keys_debounced;
+        assign gpio_in[15 : 8] = {SW8, SW7, SW6, SW5, SW4, SW3, SW2, SW1};
+        assign gpio_in[$high(gpio_in) : 16] = 0;
+
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // I2C
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+        assign ADXL345_SCL = scl_out ? 1'bZ : 1'b0;
+        assign ADXL345_SDA = sda_out ? 1'bZ : 1'b0;
+        
+        assign ADXL345_CS = 1'b1;
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // MCU
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         
@@ -251,6 +329,8 @@ module step_cyc10 (
                 init_start <= 0;
                 actual_cpu_start <= 0;
                 actual_start_addr <= 0;
+                
+                int0 <= 0;
             end else begin
                 init_start <= {init_start [$high(init_start) - 1 : 0], 1'b1};
                 actual_cpu_start <= cpu_start | ((~init_start [$high(init_start)]) & init_start [$high(init_start) - 1]);
@@ -259,6 +339,8 @@ module step_cyc10 (
                 end else if (!init_start [$high(init_start)]) begin
                     actual_start_addr <= `DEFAULT_START_ADDR;
                 end
+                
+                int0 <= ~(&five_way_keys_debounced);
             end
         end
      
@@ -267,7 +349,7 @@ module step_cyc10 (
             .reset_n ((~cpu_reset) & pll_locked),
             .sync_reset (1'b0),
             
-            .INTx (2'b00),
+            .INTx ({ADXL345_INT2, int0}),
 
             .ocd_read_enable (ocd_read_enable),
             .ocd_write_enable (ocd_write_enable),
@@ -286,8 +368,14 @@ module step_cyc10 (
             .RXD (RXD),
             .TXD (uart_tx_cpu),
             
-            .GPIO_IN (0),
+            .GPIO_IN (gpio_in),
             .GPIO_OUT(gpio_out),
+            
+            .sda_in (ADXL345_SDA),
+            .scl_in (ADXL345_SCL),
+            
+            .sda_out (sda_out),
+            .scl_out (scl_out),
     
             .start (actual_cpu_start),
             .start_address (actual_start_addr),

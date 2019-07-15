@@ -25,6 +25,7 @@
 
 `include "common.vh"
 `include "config.vh"
+`include "I2C.svh"
 
 
 `default_nettype none
@@ -71,12 +72,20 @@ module peripherals (
         
             
     //=======================================================================
-    // Debug LED
+    // GPIO
     //=======================================================================
         output logic unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_out,
-        input  wire  unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_in
+        input  wire  unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_in,
         
-  
+    //=======================================================================
+    // I2C
+    //=======================================================================
+        
+        input wire                                          sda_in, 
+        input wire                                          scl_in,
+        
+        output wire                                         sda_out,
+        output wire                                         scl_out
         
 );
 
@@ -108,12 +117,18 @@ module peripherals (
             logic unsigned [`NUM_OF_INTx - 1 : 0]       INTx_stable;
             
             wire                                        ext_int_active;
-        
+            
+            logic unsigned [`XLEN - 1 : 0]              int_enable;
         //-------------------------------------------------------------------
         //  GPIO
         //-------------------------------------------------------------------
             logic unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_in_meta;
             logic unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_in_stable;
+            
+        //-------------------------------------------------------------------
+        //  I2C
+        //-------------------------------------------------------------------
+            wire unsigned [I2C_DATA_LEN - 1 : 0]         i2c_dat_o;
             
     //=======================================================================
     // write ack
@@ -136,6 +151,7 @@ module peripherals (
         always_ff @(posedge clk, negedge reset_n) begin : output_data_proc
             if (!reset_n) begin
                 WB_RD_DAT_O <= 0;
+                               
             end else begin
                 case (WB_RD_ADR_I) 
                     `UART_TX_ADDR : begin
@@ -147,11 +163,22 @@ module peripherals (
                     end
                     
                     `INT_SOURCE_ADDR : begin
-                        WB_RD_DAT_O <= {INTx_stable, (32 - `NUM_OF_TOTAL_INT)'(0),  uart_rx_fifo_not_empty, 1'b0};
+                        WB_RD_DAT_O <= {INTx_stable, (32 - `NUM_OF_TOTAL_INT )'(0),  uart_rx_fifo_not_empty, 1'b0};
                     end
+                    
+                    `INT_ENABLE_ADDR : 
+                        WB_RD_DAT_O <= int_enable;
                     
                     `GPIO_ADDR : begin
                         WB_RD_DAT_O <= gpio_in_stable;
+                    end
+                    
+                    `I2C_CSR_ADDR : begin
+                        WB_RD_DAT_O <= i2c_dat_o;
+                    end
+                    
+                    `I2C_DATA_ADDR : begin
+                        WB_RD_DAT_O <= i2c_dat_o;
                     end
                     
                     default : begin
@@ -235,11 +262,33 @@ module peripherals (
                 gpio_in_stable <= gpio_in_meta;
             end
         end 
+        
+    //=======================================================================
+    // I2C
+    //=======================================================================
+        
+        wb_I2C #(.REG_ADDR_CSR(`I2C_CSR_ADDR), .REG_ADDR_DATA(`I2C_DATA_ADDR)) wb_I2C_i (.*,
+        
+            .stb_i (1'b1),
+            .we_i (WB_WR_WE_I),
+            .adr_wr_i (WB_WR_ADR_I),
+            .adr_rd_i (WB_RD_ADR_I),
+            .dat_i (WB_WR_DAT_I[I2C_DATA_LEN - 1 : 0]),
+            .dat_o (i2c_dat_o),
+            .ack_o (),
+        
+            .sda_in (sda_in),
+            .scl_in (scl_in),
+            
+            .sda_out (sda_out),
+            .scl_out (scl_out)
+        );
+
     //=======================================================================
     // Interrupt
     //=======================================================================
         
-        assign ext_int_active = |INTx_stable;
+        assign ext_int_active = |(INTx_stable & int_enable[`INT_EXT_INDEX_LAST : `INT_EXT_INDEX_1ST]);
         
         always_ff @(posedge clk, negedge reset_n) begin : int_gen_proc
             if (!reset_n) begin
@@ -247,13 +296,19 @@ module peripherals (
                 INTx_meta <= 0;
                 INTx_stable <= 0;
                 
+                int_enable <= 0;
+                
             end else begin
                 INTx_meta <= INTx;
                 INTx_stable <= INTx_meta;
-                int_gen <= ext_int_active | uart_rx_fifo_not_empty;
+                int_gen <= ext_int_active | (uart_rx_fifo_not_empty & int_enable[`INT_UART_RX_INDEX]);
+                
+                if ((WB_WR_ADR_I == `INT_ENABLE_ADDR) && WB_WR_WE_I) begin
+                    int_enable <= WB_WR_DAT_I;
+                end
+                
             end 
         end
-        
         
 endmodule : peripherals
 
