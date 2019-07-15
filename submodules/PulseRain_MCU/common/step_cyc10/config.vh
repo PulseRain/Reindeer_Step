@@ -88,9 +88,10 @@
     `define NUM_OF_GPIOS                       32 
     
     //------------------------------------------------------------------------
-    //  Interrupt
+    // Interrupt
     //------------------------------------------------------------------------
     `define INT_SOURCE_ADDR                    ((`MM_REG_ADDR_BITS)'(7))
+    `define INT_ENABLE_ADDR                    ((`MM_REG_ADDR_BITS)'(8))
     
     // Interrupt external to the MCU
     `define NUM_OF_INTx                        2
@@ -103,6 +104,12 @@
     `define INT_EXT_INDEX_1ST                  (32 - `NUM_OF_INTx)
     `define INT_EXT_INDEX_LAST                 31
     
+
+    //------------------------------------------------------------------------
+    // I2C
+    //------------------------------------------------------------------------
+    `define I2C_CSR_ADDR                       ((`MM_REG_ADDR_BITS)'(9))
+    `define I2C_DATA_ADDR                      ((`MM_REG_ADDR_BITS)'(10))
     
 //----------------------------------------------------------------------------
 //  hardware mul/div
