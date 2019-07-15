@@ -53,8 +53,13 @@ vlog -sv -work work +incdir+$common +incdir+$config ../../submodules/PulseRain_M
 vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/peripherals/UART/UART_RX.sv
 vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/peripherals/UART/UART_RX_WITH_FIFO.sv
 vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/peripherals/UART/UART_FIFO.sv
-vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/peripherals/peripherals.sv
 
+vlog -work work +incdir+$common +incdir+$config +incdir+../../submodules/PulseRain_MCU/peripherals/i2c -sv ../../submodules/PulseRain_MCU/peripherals/i2c/I2C_Master.sv
+vlog -work work +incdir+$common +incdir+$config +incdir+../../submodules/PulseRain_MCU/peripherals/i2c -sv ../../submodules/PulseRain_MCU/peripherals/i2c/wb_I2C.sv
+
+vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/peripherals/switch_debouncer/switch_debouncer.sv
+
+vlog -work work +incdir+$common +incdir+$config +incdir+../../submodules/PulseRain_MCU/peripherals/i2c -sv ../../submodules/PulseRain_MCU/peripherals/peripherals.sv
 
 
 
