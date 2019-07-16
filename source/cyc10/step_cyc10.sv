@@ -306,12 +306,7 @@ module step_cyc10 (
             end 
             
         endgenerate
-        
-        
-        assign gpio_in[4 : 0] = ~five_way_keys_debounced;
-        assign gpio_in[15 : 8] = {SW8, SW7, SW6, SW5, SW4, SW3, SW2, SW1};
-        assign gpio_in[$high(gpio_in) : 16] = 0;
-
+      
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // I2C
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -425,7 +420,10 @@ module step_cyc10 (
         assign REG_LED2_G = gpio_out [21];
         assign REG_LED2_B = gpio_out [22];
         
-        
+        assign gpio_in[4 : 0] = ~five_way_keys_debounced;
+        assign gpio_in[15 : 8] = {SW8, SW7, SW6, SW5, SW4, SW3, SW2, SW1};
+        assign gpio_in[$high(gpio_in) : 16] = 0;
+
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Hardware Loader
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -465,37 +463,6 @@ module step_cyc10 (
             TXD <= uart_tx_ocd;
         end
     end 
-       
-/*
-        ocd ocd_stp (
-            .acq_clk (clk_100MHz), 
-            .acq_data_in (acq_data_in), 
-            .acq_trigger_in ({sdram_slave_readdatavalid,  mem_ack, ocd_read_enable, ocd_write_enable})
-        );
-        
-        assign acq_data_in[0] = ocd_read_enable;
-        assign acq_data_in[1] = ocd_write_enable;
-        assign acq_data_in[2] = ocd_mem_enable_out;
-        assign acq_data_in[3] = cpu_reset;
-        assign acq_data_in [35 : 4] = ocd_mem_word_out;
-        assign acq_data_in [59 : 36] = pram_read_addr;
-        assign acq_data_in [83 : 60] = pram_write_addr;
-        assign acq_data_in [115 : 84] = ocd_write_word;
-        assign acq_data_in [147 : 116] = cpu_start_addr;
-        assign acq_data_in [148] = debug_uart_tx_sel_ocd1_cpu0;
-        
-        assign acq_data_in [171 : 150] = sdram_slave_address;
-        assign acq_data_in [173 : 172] = sdram_slave_byteenable_n;
-        assign acq_data_in [174] = sdram_slave_chipselect;
-        assign acq_data_in [175] = sdram_slave_read_n;
-        assign acq_data_in [176] = sdram_slave_write_n;
-        assign acq_data_in [208 : 177] = sdram_slave_writedata;
-        assign acq_data_in [240 : 209] = sdram_slave_readdata;
-        assign acq_data_in [241] = sdram_slave_readdatavalid;
-        assign acq_data_in [242] = sdram_slave_waitrequest;
-        assign acq_data_in [255 : 243] = 0;
-        
-*/
 
 endmodule : step_cyc10
 
