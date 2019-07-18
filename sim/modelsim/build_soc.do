@@ -75,8 +75,9 @@ vlog -work work  ../../cores/PLL/PLL.v
 vlog -work work  ../../cores/DDIO_OUT/DDIO_OUT.v
 vlog -work work  ../../cores/sdram/sdram/simulation/sdram.v
 
-vlog -work work +incdir+$common +incdir+$config -sv ../../source/cyc10/sdram_controller.sv
+vlog -work work +incdir+$common +incdir+$config -sv ../../submodules/PulseRain_MCU/memory/SDRAM/sdram_controller.sv
 vlog -work work +incdir+$common +incdir+$config +incdir+$hw_loader -sv ../../source/cyc10/step_cyc10.sv
+vlog -work work +incdir+$common +incdir+$config +incdir+$hw_loader -sv ../../source/cyc10/sdram_init_loader.sv
 
 
 
