@@ -165,6 +165,7 @@ module step_cyc10 (
         wire                                    processor_paused;
         
         logic unsigned [1 : 0]                  init_start = 0;
+        
         logic                                   actual_cpu_start;
         logic unsigned [`XLEN - 1 : 0]          actual_start_addr;
         
@@ -172,11 +173,18 @@ module step_cyc10 (
         wire                                    dram_ack;
         wire  [`XLEN - 1 : 0]                   dram_mem_read_data;
         
-        wire  [`MEM_ADDR_BITS - 1 : 0]          dram_mem_addr;
+        wire  [`MEM_ADDR_BITS - 1 : 0]          mcu_dram_mem_addr;
         wire                                    dram_mem_read_en;
+        wire                                    mcu_dram_mem_write_en;
+        wire  [`XLEN_BYTES - 1 : 0]             mcu_dram_mem_byte_enable;
+        wire  [`XLEN - 1 : 0]                   mcu_dram_mem_write_data;
+        
+        wire [`MEM_ADDR_BITS - 1 : 0]           dram_mem_addr;
         wire                                    dram_mem_write_en;
-        wire  [`XLEN_BYTES - 1 : 0]             dram_mem_byte_enable;
-        wire  [`XLEN - 1 : 0]                   dram_mem_write_data;
+        wire [`XLEN_BYTES - 1 : 0]              dram_mem_byte_enable;
+        wire [`XLEN - 1 : 0]                    dram_mem_write_data;
+        
+        
         wire  unsigned [`NUM_OF_GPIOS - 1 : 0]  gpio_out;
         wire  unsigned [`NUM_OF_GPIOS - 1 : 0]  gpio_in;
         
@@ -187,6 +195,13 @@ module step_cyc10 (
         wire                                    sda_out;
         wire                                    scl_out;
               
+              
+        wire unsigned [`MEM_ADDR_BITS - 1 : 0]  loader_dram_mem_addr;
+        wire                                    loader_dram_mem_write_en;
+        wire unsigned [`XLEN_BYTES - 1 : 0]     loader_dram_mem_byte_enable;
+        wire unsigned [`XLEN - 1 : 0]           loader_dram_mem_write_data;
+        wire                                    loader_done;
+    
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // PLL
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -277,7 +292,33 @@ module step_cyc10 (
                     .sdram_av_write_n (sdram_slave_write_n)
             );
 
-
+    assign dram_mem_write_en    = mcu_dram_mem_write_en | loader_dram_mem_write_en;
+    assign dram_mem_addr        = loader_dram_mem_write_en ? loader_dram_mem_addr        : mcu_dram_mem_addr;
+    assign dram_mem_byte_enable = loader_dram_mem_write_en ? loader_dram_mem_byte_enable : mcu_dram_mem_byte_enable;
+    assign dram_mem_write_data  = loader_dram_mem_write_en ? loader_dram_mem_write_data  : mcu_dram_mem_write_data;
+        
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // SDRAM loader using SRAM
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+         assign loader_dram_mem_write_en = 0;
+         assign loader_done = 0;
+        
+ 
+/*        
+        sdram_init_loader #(.ROM_SIZE_IN_BYTES (16 *1024)) sdram_init_loader_i (
+            .clk (clk_100MHz),
+            .reset_n (pll_locked),
+            
+            .dram_ack (dram_ack),
+            .dram_mem_addr          (loader_dram_mem_addr),
+            .dram_mem_write_en      (loader_dram_mem_write_en),
+            .dram_mem_byte_enable   (loader_dram_mem_byte_enable),
+            .dram_mem_write_data    (loader_dram_mem_write_data),
+            .done                   (loader_done)
+        );
+ */
+    
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // 5 way navigation switch
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -326,12 +367,14 @@ module step_cyc10 (
                 actual_start_addr <= 0;
                 
                 int0 <= 0;
+
             end else begin
                 init_start <= {init_start [$high(init_start) - 1 : 0], 1'b1};
                 actual_cpu_start <= cpu_start | ((~init_start [$high(init_start)]) & init_start [$high(init_start) - 1]);
+                //actual_cpu_start <= cpu_start | loader_done;
                 if (cpu_start) begin
                     actual_start_addr <= cpu_start_addr;
-                end else if (!init_start [$high(init_start)]) begin
+                end else begin
                     actual_start_addr <= `DEFAULT_START_ADDR;
                 end
                 
@@ -380,11 +423,11 @@ module step_cyc10 (
             .dram_ack             (dram_ack),
             .dram_mem_read_data   (dram_mem_read_data),
             
-            .dram_mem_addr        (dram_mem_addr),
+            .dram_mem_addr        (mcu_dram_mem_addr),
             .dram_mem_read_en     (dram_mem_read_en),
-            .dram_mem_write_en    (dram_mem_write_en),
-            .dram_mem_byte_enable (dram_mem_byte_enable),
-            .dram_mem_write_data  (dram_mem_write_data),
+            .dram_mem_write_en    (mcu_dram_mem_write_en),
+            .dram_mem_byte_enable (mcu_dram_mem_byte_enable),
+            .dram_mem_write_data  (mcu_dram_mem_write_data),
     
             .peek_pc (),
             .peek_ir (),
