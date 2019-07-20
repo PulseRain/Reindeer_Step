@@ -66,7 +66,7 @@ uint8_t chceck_ADXL345_Interrupt_Status()
 
       return t;
       
-}
+} // End of chceck_ADXL345_Interrupt_Status()
 
 //----------------------------------------------------------------------------
 // ADXL345_init()
@@ -97,7 +97,7 @@ void ADXL345_init()
 
     chceck_ADXL345_Interrupt_Status();
     
-}
+} // End of ADXL345_init()
 
 //----------------------------------------------------------------------------
 // get_ADXL345_XYZ()
@@ -168,7 +168,8 @@ uint8_t get_ADXL345_XYZ(int16_t *pX, int16_t *pY, int16_t *pZ)
     }
 
     return t;
-}
+    
+} // End of get_ADXL345_XYZ()
 
 
 
@@ -186,7 +187,8 @@ void uart_rx_isr()
     
     t = Serial.read();    
     uart_rx_buf [uart_rx_index_write_point++] = t;
-}    
+    
+} // End of uart_rx_isr()
 
 
 
@@ -206,9 +208,7 @@ void int0_keys_isr()
     if (t) {
         keys[key_write_point++] = t;
     }
-}
-
-
+} // End of int0_keys_isr()
 
 
 //================================================================================================================
@@ -232,7 +232,7 @@ void setup() {
  //   GPIO_P3 = 0xAA;
  //   delay(5000);
 
-}
+} // End of setup()
 
 
 //================================================================================================================
@@ -315,4 +315,4 @@ void loop() {
     
     delay(1000);
 
-}
+} // End of loop()
