@@ -234,7 +234,7 @@ module PulseRain_Reindeer_MCU (
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         genvar i;
         generate 
-            for (i = 0; i < (1 - `ENABLE_VERILATOR_SIM) ; i = i + 1) begin : gen_peripheral
+            for (i = 0; i < `INCLUDE_PERIPHERAL ; i = i + 1) begin : gen_peripheral
                peripherals peripherals_i (
                     .clk                (clk),
                     .reset_n            (reset_n),

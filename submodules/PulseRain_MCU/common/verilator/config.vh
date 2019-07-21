@@ -18,7 +18,7 @@
 `ifndef CONFIG_VH
 `define CONFIG_VH
 
-`define ENABLE_VERILATOR_SIM (1)
+`define INCLUDE_PERIPHERAL (0)
 
 //----------------------------------------------------------------------------
 //  default start address 
