@@ -232,42 +232,45 @@ module PulseRain_Reindeer_MCU (
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // peripherals 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        genvar i;
+        generate 
+            for (i = 0; i < (1 - `ENABLE_VERILATOR_SIM) ; i = i + 1) begin : gen_peripheral
+               peripherals peripherals_i (
+                    .clk                (clk),
+                    .reset_n            (reset_n),
+                    .sync_reset         (sync_reset),
+                
+                    .INTx               (INTx),
+                
+                    .WB_RD_STB_I (WB_RD_STB),
+                    .WB_RD_ADR_I (WB_RD_ADR),
+                    .WB_RD_DAT_O (WB_RD_DAT),
+                    .WB_RD_ACK_O (WB_RD_ACK),
+                    
+                    .WB_WR_STB_I (WB_WR_STB),
+                    .WB_WR_WE_I  (WB_WR_WE),
+                    .WB_WR_SEL_I (WB_WR_SEL),
+                    .WB_WR_ADR_I (WB_WR_ADR),
+                    .WB_WR_DAT_I (WB_WR_DAT),
+                    .WB_WR_ACK_O (WB_WR_ACK),
+                    
+                    .int_gen     (int_gen),
+                
+                    .RXD         (RXD),
+                    .TXD         (TXD),
+                
+                    .gpio_out    (GPIO_OUT),
+                    .gpio_in     (GPIO_IN),
+                    
+                    .sda_in      (sda_in),
+                    .scl_in      (scl_in),
+                    
+                    .sda_out     (sda_out),
+                    .scl_out     (scl_out)
+                );
+            end
+        endgenerate
         
-       peripherals peripherals_i (
-            .clk                (clk),
-            .reset_n            (reset_n),
-            .sync_reset         (sync_reset),
-        
-            .INTx               (INTx),
-        
-            .WB_RD_STB_I (WB_RD_STB),
-            .WB_RD_ADR_I (WB_RD_ADR),
-            .WB_RD_DAT_O (WB_RD_DAT),
-            .WB_RD_ACK_O (WB_RD_ACK),
-            
-            .WB_WR_STB_I (WB_WR_STB),
-            .WB_WR_WE_I  (WB_WR_WE),
-            .WB_WR_SEL_I (WB_WR_SEL),
-            .WB_WR_ADR_I (WB_WR_ADR),
-            .WB_WR_DAT_I (WB_WR_DAT),
-            .WB_WR_ACK_O (WB_WR_ACK),
-            
-            .int_gen     (int_gen),
-        
-            .RXD         (RXD),
-            .TXD         (TXD),
-        
-            .gpio_out    (GPIO_OUT),
-            .gpio_in     (GPIO_IN),
-            
-            .sda_in      (sda_in),
-            .scl_in      (scl_in),
-            
-            .sda_out     (sda_out),
-            .scl_out     (scl_out)
-         
-            );
-  
         assign  peek_mem_write_en   = mem_write_en;
         assign  peek_mem_write_data = mem_write_data;
         assign  peek_mem_addr       = mem_addr;    
