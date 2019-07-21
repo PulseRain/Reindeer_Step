@@ -91,6 +91,7 @@ module mem_controller (
     //=======================================================================
     // SRAM
     //=======================================================================
+        /* verilator lint_off UNSIGNED */
         assign mem_sram0_dram1 = (mem_addr >= (`SRAM_SIZE_IN_BYTES / 4)) ? 1'b1 : 1'b0; 
            
             generate 
