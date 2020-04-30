@@ -167,7 +167,7 @@ set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
 set_global_assignment -name OPTIMIZATION_MODE "AGGRESSIVE PERFORMANCE"
 set_global_assignment -name PLACEMENT_EFFORT_MULTIPLIER 13
 set_global_assignment -name ROUTER_EFFORT_MULTIPLIER 10
-set_global_assignment -name SEED 26
+set_global_assignment -name SEED 25
 #set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to reset_n
 set_global_assignment -name TIMING_ANALYZER_MULTICORNER_ANALYSIS ON
 set_global_assignment -name ENABLE_OCT_DONE OFF

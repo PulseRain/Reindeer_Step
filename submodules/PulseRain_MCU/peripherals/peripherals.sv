@@ -119,6 +119,10 @@ module peripherals (
             wire                                        ext_int_active;
             
             logic unsigned [`XLEN - 1 : 0]              int_enable;
+            
+            // round robin mask
+            logic unsigned [`NUM_OF_INTx : 0]           int_mask = (`NUM_OF_INTx)'(1);
+            
         //-------------------------------------------------------------------
         //  GPIO
         //-------------------------------------------------------------------
@@ -163,7 +167,7 @@ module peripherals (
                     end
                     
                     `INT_SOURCE_ADDR : begin
-                        WB_RD_DAT_O <= {INTx_stable, (32 - `NUM_OF_TOTAL_INT )'(0),  uart_rx_fifo_not_empty, 1'b0};
+                        WB_RD_DAT_O <= {INTx_stable & int_mask, (32 - `NUM_OF_TOTAL_INT )'(0),  uart_rx_fifo_not_empty, 1'b0};
                     end
                     
                     `INT_ENABLE_ADDR : 
@@ -288,15 +292,17 @@ module peripherals (
     // Interrupt
     //=======================================================================
         
-        assign ext_int_active = |(INTx_stable & int_enable[`INT_EXT_INDEX_LAST : `INT_EXT_INDEX_1ST]);
+        assign ext_int_active = |(INTx_stable & int_mask & int_enable[`INT_EXT_INDEX_LAST : `INT_EXT_INDEX_1ST]);
         
         always_ff @(posedge clk, negedge reset_n) begin : int_gen_proc
             if (!reset_n) begin
-                int_gen <= 0;
-                INTx_meta <= 0;
-                INTx_stable <= 0;
+                int_gen                 <= 0;
+                INTx_meta               <= 0;
+                INTx_stable             <= 0;
                 
-                int_enable <= 0;
+                int_enable              <= 0;
+                
+                int_mask                <= ($size(int_mask))'(1);
                 
             end else begin
                 INTx_meta <= INTx;
@@ -305,6 +311,10 @@ module peripherals (
                 
                 if ((WB_WR_ADR_I == `INT_ENABLE_ADDR) && WB_WR_WE_I) begin
                     int_enable <= WB_WR_DAT_I;
+                end
+                
+                if (((INTx_stable & int_mask) == 0) || ((int_enable[`INT_EXT_INDEX_LAST : `INT_EXT_INDEX_1ST] & int_mask) == 0))  begin
+                    int_mask <= {int_mask[0], int_mask[$high(int_mask) : 1]};
                 end
                 
             end 
