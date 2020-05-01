@@ -141,6 +141,7 @@ module PulseRain_Reindeer_MCU (
         wire                                                    WB_WR_ACK;
         
         wire                                                    int_gen;
+        wire                                                    clear_ext_int;
         
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // processor core
@@ -166,6 +167,7 @@ module PulseRain_Reindeer_MCU (
                 .ocd_reg_write_data (ocd_reg_write_data),
                 
                 .ext_int_triggered (int_gen),
+                .clear_ext_int (clear_ext_int),
                 
                 .WB_RD_CYC_O (WB_RD_CYC),
                 .WB_RD_STB_O (WB_RD_STB),
@@ -254,7 +256,8 @@ module PulseRain_Reindeer_MCU (
                     .WB_WR_DAT_I (WB_WR_DAT),
                     .WB_WR_ACK_O (WB_WR_ACK),
                     
-                    .int_gen     (int_gen),
+                    .int_gen       (int_gen),
+                    .clear_ext_int (clear_ext_int),
                 
                     .RXD         (RXD),
                     .TXD         (TXD),

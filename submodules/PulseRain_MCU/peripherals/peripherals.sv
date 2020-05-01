@@ -63,7 +63,7 @@ module peripherals (
     // Interrupt
     //=======================================================================
         output  logic                                       int_gen,
-    
+        input   wire                                        clear_ext_int,
     //=======================================================================
     // UART
     //=======================================================================
@@ -115,24 +115,23 @@ module peripherals (
         //-------------------------------------------------------------------
             logic unsigned [`NUM_OF_INTx - 1 : 0]       INTx_meta;
             logic unsigned [`NUM_OF_INTx - 1 : 0]       INTx_stable;
+            logic unsigned [`NUM_OF_INTx - 1 : 0]       INTx_stable_d1;
+            logic unsigned [`NUM_OF_INTx - 1 : 0]       INTx_log;
             
             wire                                        ext_int_active;
             
             logic unsigned [`XLEN - 1 : 0]              int_enable;
-            
-            // round robin mask
-            logic unsigned [`NUM_OF_INTx : 0]           int_mask = (`NUM_OF_INTx)'(1);
-            
+     
         //-------------------------------------------------------------------
         //  GPIO
         //-------------------------------------------------------------------
-            logic unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_in_meta;
-            logic unsigned [`NUM_OF_GPIOS - 1 : 0]       gpio_in_stable;
+            logic unsigned [`NUM_OF_GPIOS - 1 : 0]      gpio_in_meta;
+            logic unsigned [`NUM_OF_GPIOS - 1 : 0]      gpio_in_stable;
             
         //-------------------------------------------------------------------
         //  I2C
         //-------------------------------------------------------------------
-            wire unsigned [I2C_DATA_LEN - 1 : 0]         i2c_dat_o;
+            wire unsigned [I2C_DATA_LEN - 1 : 0]        i2c_dat_o;
             
     //=======================================================================
     // write ack
@@ -167,7 +166,7 @@ module peripherals (
                     end
                     
                     `INT_SOURCE_ADDR : begin
-                        WB_RD_DAT_O <= {INTx_stable & int_mask, (32 - `NUM_OF_TOTAL_INT )'(0),  uart_rx_fifo_not_empty, 1'b0};
+                        WB_RD_DAT_O <= {INTx_log, (32 - `NUM_OF_TOTAL_INT )'(0),  uart_rx_fifo_not_empty, 1'b0};
                     end
                     
                     `INT_ENABLE_ADDR : 
@@ -292,37 +291,37 @@ module peripherals (
     // Interrupt
     //=======================================================================
         
-        assign ext_int_active = |(INTx_stable & int_mask & int_enable[`INT_EXT_INDEX_LAST : `INT_EXT_INDEX_1ST]);
+        assign ext_int_active = |(INTx_log & int_enable[`INT_EXT_INDEX_LAST : `INT_EXT_INDEX_1ST]);
         
         always_ff @(posedge clk, negedge reset_n) begin : int_gen_proc
             if (!reset_n) begin
                 int_gen                 <= 0;
                 INTx_meta               <= 0;
                 INTx_stable             <= 0;
-                
+                INTx_stable_d1          <= 0;
+                INTx_log                <= 0;
                 int_enable              <= 0;
                 
-                int_mask                <= ($size(int_mask))'(1);
-                
             end else begin
-                INTx_meta <= INTx;
-                INTx_stable <= INTx_meta;
-                int_gen <= ext_int_active | (uart_rx_fifo_not_empty & int_enable[`INT_UART_RX_INDEX]);
+                INTx_meta               <= INTx;
+                INTx_stable             <= INTx_meta;
+                INTx_stable_d1          <= INTx_stable;
                 
+                if (clear_ext_int) begin
+                    INTx_log <= 0;
+                    int_gen  <= 0;
+                end else begin
+                    INTx_log        <= ((~INTx_stable_d1) & INTx_stable) | INTx_log;
+                    int_gen         <= ext_int_active | (uart_rx_fifo_not_empty & int_enable[`INT_UART_RX_INDEX] );
+                end
+                   
                 if ((WB_WR_ADR_I == `INT_ENABLE_ADDR) && WB_WR_WE_I) begin
                     int_enable <= WB_WR_DAT_I;
-                end
-                
-                if (((INTx_stable & int_mask) == 0) || ((int_enable[`INT_EXT_INDEX_LAST : `INT_EXT_INDEX_1ST] & int_mask) == 0))  begin
-                    int_mask <= {int_mask[0], int_mask[$high(int_mask) : 1]};
                 end
                 
             end 
         end
         
 endmodule : peripherals
-
-
-
 
 `default_nettype wire

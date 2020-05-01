@@ -69,7 +69,8 @@ module Reindeer_CSR (
         output  wire                                            meie_out,
         output  wire                                            mie_out,
         output  wire                                            mtip_out,
-        output  wire                                            meip_out
+        output  wire                                            meip_out,
+        output  reg                                             clear_ext_int
         
 );
 
@@ -148,8 +149,10 @@ module Reindeer_CSR (
                 timer_triggered_d1   <= 0;
                 ext_int_triggered_d1 <= 0;
                 
-                mtip <= 0;
-                meip <= 0;
+                mtip            <= 0;
+                meip            <= 0;
+                
+                clear_ext_int   <= 0;
         
             end else begin
             
@@ -159,6 +162,8 @@ module Reindeer_CSR (
                 read_en_out_i   <= read_enable;
                 
                 exception_storage_page_fault <= 0;
+                
+                clear_ext_int   <= 0;
                 
                 if (`SMALL_CSR_SET == 0) begin
                     mcycle_i <= mcycle_i + 1;
@@ -329,6 +334,8 @@ module Reindeer_CSR (
                             `CSR_MIP       : begin
                                 mtip        <= write_data_in[7];
                                 meip        <= write_data_in[11];
+                                
+                                clear_ext_int <= meip & (~write_data_in[11]);
                             end
                             
                             default :  begin

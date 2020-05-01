@@ -50,6 +50,7 @@ module PulseRain_Reindeer_core (
     // External Interrupt
     //=====================================================================
         input   wire                                            ext_int_triggered,
+        output  wire                                            clear_ext_int,
         
     //=======================================================================
     // Wishbone Host Interface 
@@ -386,13 +387,14 @@ module PulseRain_Reindeer_core (
                 .exception_addr     (exception_addr),
                 
                 .exception_storage_page_fault (csr_exception_storage_page_fault),
-                .mtvec_out (mtvec_value),
-                .mepc_out  (mepc_value),
-                .mtie_out  (mtie_out),
-                .meie_out  (meie_out),
-                .mie_out   (mie_out),
-                .mtip_out  (mtip_out),
-                .meip_out  (meip_out));
+                .mtvec_out     (mtvec_value),
+                .mepc_out      (mepc_value),
+                .mtie_out      (mtie_out),
+                .meie_out      (meie_out),
+                .mie_out       (mie_out),
+                .mtip_out      (mtip_out),
+                .meip_out      (meip_out),
+                .clear_ext_int (clear_ext_int));
             
         //---------------------------------------------------------------------
         // fetch instruction
