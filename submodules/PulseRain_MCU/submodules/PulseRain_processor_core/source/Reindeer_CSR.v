@@ -332,10 +332,13 @@ module Reindeer_CSR (
                             end
                             
                             `CSR_MIP       : begin
-                                mtip        <= write_data_in[7];
-                                meip        <= write_data_in[11];
+                                if (mcause[`EXCEPTION_CODE_BITS - 1 : 0] == `INTERRUPT_MACHINE_TIMER) begin
+                                    mtip      <= write_data_in[7];
+                                end
                                 
+                                meip          <= write_data_in[11];
                                 clear_ext_int <= meip & (~write_data_in[11]);
+                                
                             end
                             
                             default :  begin
