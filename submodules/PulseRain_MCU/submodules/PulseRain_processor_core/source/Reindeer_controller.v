@@ -292,7 +292,7 @@ module Reindeer_controller (
                             fetch_init_active <= 1'b0;
                         end
                         
-                        ctl_interrupt_set_reg <= ctl_set_timer_interrupt_active + ctl_set_ext_interrupt_active;
+                        ctl_interrupt_set_reg <= ctl_set_timer_interrupt_active | ctl_set_ext_interrupt_active;
                         
                         if (exception_ebreak | exception_ecall | exception_storage_page_fault | ctl_instruction_addr_misalign_exception ) begin
                             exception_PC <= PC_in;
